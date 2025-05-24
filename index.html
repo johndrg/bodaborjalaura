@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Borja &amp; Laura - Celebración</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        .counter-text {
+          font-size: 1.1rem;
+          color: white;
+          margin-top: 1rem;
+          animation: fadeIn 2s ease-in;
+        }
+        .bonus-hint {
+          display: block !important;
+          visibility: visible !important;
+          opacity: 1 !important;
+          color: #555 !important;
+          font-style: italic !important;
+        }
+        .question-option.selected {
+          outline: 3px solid #8e44ad;
+          border-radius: 8px;
+        }
+        .question-option-2.selected {
+          outline: 3px solid #8e44ad;
+          border-radius: 8px;
+        }
+        .secret-video {
+          max-width: 100%;
+          border-radius: 8px;
+          display: block;
+          margin: 0 auto;
+  }
+    </style>
+</head>
+<body>
+<!-- Splash Screen -->
+<section class="splash" id="splash">
+    <div class="splash-bg"></div>
+    <h1 class="names">Borja <span class="ampersand">&</span> Laura</h1>
+    <p id="wedding-counter" class="counter-text"></p>
+    <div class="scroll-arrow" id="scroll-down">
+        <i class="fas fa-chevron-down"></i>
+    </div>
+</section>
+
+<!-- Letter Section -->
+<section class="section section-light">
+    <div class="container">
+        <div class="letter-container">
+            <div class="letter-decoration"></div>
+            <div class="letter-content">
+                <h2 class="letter-heading">Queridos Borja y Laura,</h2>
+
+                <div class="letter">
+                    <p>
+                        ¡Felicidades por vuestro gran día! Sabemos que habéis estado muy
+                        ocupados organizando la boda. Lo valoramos un montón ya que
+                        sabemos de sobra que es muy difícil sacar tiempo libre entre
+                        siesta y siesta, tanto en las guardias como (en lo que sea que
+                        haga Borja, ya que ninguno sabemos que es lo que hace).
+                    </p>
+
+                    <p>
+                        Como conocidos vuestros, queremos haceros un regalo que os ayude
+                        a empujar en vuestra ardua tarea. No es la entrada del
+                        quíntuplex, pero esperamos que os ayude a llevar mejor los
+                        gastos.
+                    </p>
+
+                    <div class="quote">
+                        La verdadera riqueza no está en el valor de las cosas, sino en
+                        el amor y la amistad que compartimos. Así que, esperamos que
+                        este bloque de hormigón represente vuestra sólida relación y
+                        nuestro apoyo incondicional. También representa que para
+                        romperlo Borja no va a hacer nada, y que Laura lo va a dejar
+                        pasar por pereza a ver si alguien lo rompe por ella.<br />
+                        ¡Que vuestro amor sea tan fuerte y que siempre encontréis la
+                        manera de construir un futuro juntos!<br />
+                    </div>
+
+                    <div>
+                        Creemos que no hay mejor regalo que una cita motivadora.
+                    </div>
+
+                    <div class="signatures">
+                        <div>Os queremos:</div>
+                        <div>
+                            Andrés, Jonatan, Eva, Daniel, Antonio, Yara, Irene, Clara,
+                            Adrián, Lara, Victor, Frank, Javier, Berto, Xerman, Marcos.
+                        </div>
+                        <div>
+                            <strong>Sí, va por orden de lo que os queremos.</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Puzzle Section -->
+<section class="puzzle-section" id="puzzle-section">
+    <div class="container">
+        <div class="puzzle-container">
+            <i class="fas fa-lock lock-icon"></i>
+            <h2 class="puzzle-title">Desbloquea Fotos Secretas</h2>
+            <p class="puzzle-description">
+                Para acceder a las fotos más especiales, demuestra cuánto conoces a
+                Borja y Laura respondiendo correctamente a estas preguntas.
+            </p>
+
+            <div class="puzzle-questions">
+                <div class="puzzle-question" data-correct="2">
+                    <p class="question-text">1. ¿Cómo se conocieron Borja y Laura?</p>
+                    <div class="question-options">
+                        <div class="question-option" data-index="0">
+                            En un congreso
+                        </div>
+                        <div class="question-option" data-index="1">
+                            En la furgo de la -3
+                        </div>
+                        <div class="question-option" data-index="2">
+                            Saliendo de fiesta, de golfos a cazar
+                        </div>
+                    </div>
+                </div>
+
+                <div class="puzzle-question" data-correct="1">
+                    <p class="question-text">
+                        2. ¿Que aficiones tienen Borja y Laura en común?
+                    </p>
+                    <div class="question-options">
+                        <div class="question-option" data-index="0">Fumar</div>
+                        <div class="question-option" data-index="1">
+                            Coleccionar gatos
+                        </div>
+                        <div class="question-option" data-index="2">Cocinar</div>
+                    </div>
+                </div>
+
+                <div class="puzzle-question" data-correct="1">
+                    <p class="question-text">3. ¿Cual es su reality favorito?</p>
+                    <div class="question-options">
+                        <div class="question-option" data-index="0">
+                            La isla de la tentaciones
+                        </div>
+                        <div class="question-option" data-index="1">
+                            Forjado a fuego
+                        </div>
+                        <div class="question-option" data-index="2">
+                            Maestros de la costura
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="check-answers-btn" id="check-answers-btn">
+                Verificar Respuestas
+            </button>
+
+            <div class="puzzle-result" id="puzzle-success">
+                <h3>¡Felicidades! Has desbloqueado las fotos secretas.</h3>
+                <p>
+                    Ahora puedes disfrutar de estas memorias especiales de Borja y
+                    Laura.
+                </p>
+            </div>
+
+            <div class="puzzle-result" id="puzzle-failure">
+                <h3>¡Casi! Algunas respuestas no son correctas.</h3>
+                <p>Inténtalo de nuevo, sabemos que conoces bien a la pareja.</p>
+            </div>
+
+            <div class="secret-gallery" id="secret-gallery">
+                <h3 class="secret-gallery-heading">
+                    Momentos Especiales Desbloqueados
+                </h3>
+                <p>
+                    Has descubierto estas fotos exclusivas que capturan momentos
+                    únicos.
+                </p>
+
+                <div class="secret-gallery-container">
+                    <div class="secret-image-container">
+                        <img
+                                src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/20230915_195922000_iOS.jpg?v=1746783186007"
+                                alt="Foto secreta 1"
+                                class="secret-image"
+                        />
+                        <div class="secret-image-caption">La verdadera ella</div>
+                    </div>
+                    <div class="secret-image-container">
+                        <img
+                                src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/WhatsApp%20Image%202025-05-09%20at%2012.00.22.jpeg?v=1746784971476"
+                                alt="Foto secreta 2"
+                                class="secret-image"
+                        />
+                        <div class="secret-image-caption">El verdadero él</div>
+                    </div>
+                    <div class="secret-image-container">
+                        <img
+                                src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/WhatsApp%20Image%202025-05-09%20at%2011.44.30.jpeg?v=1746784844112"
+                                alt="Foto secreta 2"
+                                class="secret-image"
+                        />
+                        <div class="secret-image-caption">Ellos</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Puzzle Section 2 -->
+<section class="puzzle-section" id="puzzle-section-2">
+    <div class="container">
+        <div class="puzzle-container">
+            <i class="fas fa-lock lock-icon"></i>
+            <h2 class="puzzle-title">Desbloquea algo más sucio</h2>
+            <p class="puzzle-description">
+                ¡Vamos a por la matrícula! Demuestra cuánto conoces a Borja y Laura resolviendo este otro test.
+            </p>
+
+            <div class="puzzle-questions">
+                <!-- Pregunta 4 -->
+                <div class="puzzle-question-2" data-correct="0">
+                    <p class="question-text">4. ¿Team?</p>
+                    <div class="question-options">
+                        <div class="question-option-2" data-index="0">
+                            <img src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/Horda.jpg?v=1747847377731" alt="Horda" style="max-width: 120px; border-radius: 8px;" />
+                        </div>
+                        <div class="question-option-2" data-index="1">
+                            <img src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/alianza.jpg?v=1747847369680" alt="Alianza" style="max-width: 120px; border-radius: 8px;" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pregunta 5 -->
+                <div class="puzzle-question-2" data-correct="1">
+                    <p class="question-text">5. ¿Cuál es la correcta?</p>
+                    <div class="question-options">
+                        <div class="question-option-2" data-index="0">
+                            <img src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/Bandeira_galega_socialista.jpeg?v=1747848321233" alt="Galiza" style="max-width: 120px; border-radius: 8px;" />
+                        </div>
+                        <div class="question-option-2" data-index="1">
+                            <img src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/Hombre%20dominado.jpg?v=1747847998377" alt="Dominado" style="max-width: 120px; border-radius: 8px;" />
+                        </div>
+                        <div class="question-option-2" data-index="2">
+                            <img src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/240270_puc3b1o_morado_simbolo.jpg?v=1747848452421" alt="8M" style="max-width: 120px; border-radius: 8px;" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pregunta 6 -->
+                <div class="puzzle-question-2" data-correct="2">
+                    <p class="question-text">6. ¿Equipo favorito?</p>
+                    <div class="question-options">
+                        <div class="question-option-2" data-index="0">
+                            <img src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/Escudo-Club-Atl%C3%A9tico-Osasuna.jpeg?v=1747848789523" alt="Osasuna" style="max-width: 120px; border-radius: 8px;" />
+                        </div>
+                        <div class="question-option-2" data-index="1">
+                            <img src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/large_thumbnail.jpeg?v=1747848856427" alt="Borussia" style="max-width: 120px; border-radius: 8px;" />
+                        </div>
+                        <div class="question-option-2" data-index="2">
+                            <img src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/2024-06-10_c75fb32baf077.jpeg?v=1747848807521" alt="Betis" style="max-width: 120px; border-radius: 8px;" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="check-answers-btn" id="check-answers-btn-2">
+                Verificar Respuestas
+            </button>
+
+            <div class="puzzle-result" id="puzzle-success-2">
+                <h3>¡Felicidades! Has desbloqueado más cositas.</h3>
+                <p>
+                    Esto no debéis olvidarlo.
+                </p>
+            </div>
+
+            <div class="puzzle-result" id="puzzle-failure-2">
+                <h3>¡Casi! Algunas respuestas no son correctas.</h3>
+                <p>Inténtalo de nuevo, ¡estás cerca!</p>
+            </div>
+
+            <div class="secret-gallery" id="secret-gallery-2" style="display: none;">
+                <h3 class="secret-gallery-heading">Momentos Extra Desbloqueados</h3>
+                <p>Momentos para no olvidarse.</p>
+
+                <div class="secret-gallery-container" style="text-align: center;">
+                    <a
+                            href="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/VIDEO-2025-05-10-16-51-22.mp4?v=1747850777039"
+                            target="_blank"
+                            class="secret-video-link"
+                            style="display: inline-block; background-color: #003366; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: 1.2rem; margin-top: 20px;">
+                        🎥 Aprieta Papi!
+                    </a>
+                    <div class="secret-image-caption" style="margin-top: 10px;">El ritmo</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Gallery Section -->
+<section class="gallery-section" id="gallery-section">
+    <div class="container">
+        <h2 class="gallery-heading">Momentos Compartidos</h2>
+
+        <div class="gallery-container" id="gallery-container">
+            <!-- Las imágenes existentes se mantienen igual -->
+            <div class="gallery-item">
+                <img
+                        src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/WhatsApp%20Image%202025-05-08%20at%2019.45.42%20(2).jpeg?v=1746728129766"
+                        alt="Foto 1"
+                        class="gallery-img"
+                        loading="lazy"
+                        data-aspect="1.5"
+                />
+            </div>
+            <div class="gallery-item">
+                <img
+                        src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/WhatsApp%20Image%202025-05-08%20at%2019.45.42%20(3).jpeg?v=1746728161348"
+                        alt="Foto 2"
+                        class="gallery-img"
+                        loading="lazy"
+                        data-aspect="1.5"
+                />
+            </div>
+            <div class="gallery-item">
+                <img
+                        src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/WhatsApp%20Image%202025-05-08%20at%2019.45.43.jpeg?v=1746728108125"
+                        alt="Foto 3"
+                        class="gallery-img"
+                        loading="lazy"
+                />
+            </div>
+            <div class="gallery-item">
+                <img
+                        src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/WhatsApp%20Image%202025-05-08%20at%2019.55.12.jpeg?v=1746728103230"
+                        alt="Foto 4"
+                        class="gallery-img"
+                        loading="lazy"
+                />
+            </div>
+            <div class="gallery-item">
+                <img
+                        src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/WhatsApp%20Image%202025-05-08%20at%2019.45.42.jpeg?v=1746728135331"
+                        alt="Foto 5"
+                        class="gallery-img"
+                        loading="lazy"
+                />
+            </div>
+            <div class="gallery-item">
+                <img
+                        src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/WhatsApp%20Image%202025-05-08%20at%2019.45.42%20(3).jpeg?v=1746728161348"
+                        alt="Foto 6"
+                        class="gallery-img"
+                        loading="lazy"
+                />
+            </div>
+            <div class="gallery-item">
+                <img
+                        src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/3-e55c4fc4.jpg?v=1746783711918"
+                        alt="Foto 7"
+                        class="gallery-img"
+                        loading="lazy"
+                />
+            </div>
+            <div class="gallery-item">
+                <img
+                        src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/465946741_10231811962833894_3386761079827116128_n.jpg?v=1746783747284"
+                        alt="Foto 8"
+                        class="gallery-img"
+                        loading="lazy"
+                />
+            </div>
+            <div class="gallery-item">
+                <img
+                        src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/465608273_10231751611405146_3050879601457603346_n.jpg?v=1746784278863"
+                        alt="Foto 9"
+                        class="gallery-img"
+                        loading="lazy"
+                />
+            </div>
+            <div class="gallery-item">
+                <img
+                        src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/20230618_211700000_iOS.jpg?v=1746783195150"
+                        alt="Foto 10"
+                        class="gallery-img"
+                        loading="lazy"
+                />
+            </div>
+            <div class="gallery-item">
+                <img
+                        src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/1-e55c4fc4.jpg?v=1746783705330"
+                        alt="Foto 11"
+                        class="gallery-img"
+                        loading="lazy"
+                />
+            </div>
+            <div class="gallery-item">
+                <img
+                        src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/b70ecb42-6412-47f8-8937-0cb437da92ee.JPG?v=1747854380548"
+                        alt="Foto 12"
+                        class="gallery-img"
+                        loading="lazy"
+                />
+            </div>
+            <!-- Aquí se pueden añadir fácilmente más imágenes sin cambiar la estructura -->
+        </div>
+    </div>
+</section>
+
+<!-- Photo Modal - Mejorado para rendimiento -->
+<div class="modal" id="photo-modal">
+      <span class="close-modal" id="close-modal">
+        <i class="fas fa-times"></i>
+      </span>
+    <div class="modal-spinner" id="modal-spinner"></div>
+    <div class="modal-content">
+        <img src="" alt="Foto expandida" class="modal-img" id="modal-img" />
+    </div>
+    <div class="modal-caption" id="modal-caption">
+        <span id="modal-counter">1/11</span>
+    </div>
+    <div class="modal-nav">
+        <button class="modal-nav-btn" id="prev-photo">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="modal-nav-btn" id="next-photo">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Enlaces de Interés Section -->
+<section class="links-section" id="links-section">
+    <div class="links-container">
+        <h2 class="links-heading">Enlaces de Interés</h2>
+
+        <div class="links-grid">
+            <div class="link-card">
+                <div class="link-icon venue">
+                    <i class="fas fa-church"></i>
+                </div>
+                <div class="link-content">
+                    <h3 class="link-title">Encuentro de Reflexión</h3>
+                    <p class="link-description">
+                        Podéis asistir a la Sala de Tradiciones de Vigo, donde tendrá
+                        lugar una reunión, seguido de un tiempo de convivencia en el
+                        Espacio de los Doce Pasos. Consulta todos los detalles sobre
+                        puntos de encuentro y el programa de "Solo por hoy".
+                    </p>
+                    <a href="https://www.alcoholicos-anonimos.org" class="link-button"
+                    >Me interesa</a
+                    >
+                </div>
+            </div>
+
+            <div class="link-card">
+                <div class="link-icon gift">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <div class="link-content">
+                    <h3 class="link-title">Lista de Regalos</h3>
+                    <p class="link-description">
+                        Si deseas hacerles un regalo a los novios, aquí encontrarás su
+                        lista de bodas.
+                    </p>
+                    <a
+                            href="https://www.chollometro.com/categorias/mascotas"
+                            class="link-button"
+                    >Ver lista de regalos</a
+                    >
+                </div>
+            </div>
+
+            <div class="link-card">
+                <div class="link-icon hotel">
+                    <i class="fas fa-bed"></i>
+                </div>
+                <div class="link-content">
+                    <h3 class="link-title">Alojamiento</h3>
+                    <p class="link-description">
+                        Hemos negociado tarifas especiales para los invitados en varios
+                        hoteles cercanos. Reserva con el código "BorjaLaura2025" para
+                        obtener descuento.
+                    </p>
+                    <a
+                            href="https://www.idealista.com/venta-viviendas/la-moraleja/la-moraleja-urbanizacion/"
+                            class="link-button"
+                    >Ver opciones</a
+                    >
+                </div>
+            </div>
+
+            <div class="link-card">
+                <div class="link-icon aventure">
+                    <i class="fas fa-vr-cardboard"></i>
+                </div>
+                <div class="link-content">
+                    <h3 class="link-title">Experiencia</h3>
+                    <p class="link-description">
+                        Disfrutad de una experiencia única!
+                        No todo el mundo tiene la oportunidad de disfrutarlo!
+                    </p>
+                    <a
+                            href="https://kinepolis.es/3d/"
+                            class="link-button"
+                    >Reservar aventura</a
+                    >
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Bonus Track Section -->
+<section class="bonus-section" id="bonus-section" style="padding: 40px 0; background: #0a183d">
+    <div class="bonus-container" style="text-align: center; max-width: 800px; margin: auto">
+        <button class="bonus-button" id="bonus-button" style="padding: 12px 24px; font-size: 1.2rem; background: #e74c3c; color: white; border: none; border-radius: 30px; cursor: pointer;">
+            <i class="fas fa-star"></i> Bonus Track
+        </button>
+
+        <div class="bonus-content" id="bonus-content" style="display: none; margin-top: 30px; background: white; padding: 30px; border-radius: 10px;">
+            <div class="bonus-image-container">
+                <img src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/cubo.jpeg?v=1746790810820" alt="Foto misteriosa" style="max-width: 100%; border-radius: 8px; margin-bottom: 20px;">
+            </div>
+
+            <div class="bonus-question">
+                <p style="font-size: 1.2rem;">¿No notas nada extraño en la foto?</p>
+            </div>
+
+            <form class="bonus-form" id="bonus-form" style="margin-top: 20px;">
+                <input type="text" class="bonus-input" id="bonus-answer" placeholder="Escribe aquí tu respuesta..." autocomplete="off" style="padding: 10px; width: 80%; max-width: 400px; font-size: 1rem;">
+                <br>
+                <button type="submit" class="bonus-submit" style="margin-top: 10px; padding: 10px 20px; background-color: #003366; color: white; border: none; border-radius: 5px; font-size: 1rem; cursor: pointer;">
+                    Comprobar
+                </button>
+            </form>
+
+            <!-- Adivinanza / Pista -->
+            <div class="bonus-hint">
+                Pista: Dos hermanos inseparables, en bolsa protegidos van,<br>
+                guardianes de la vida futura, en conjunto siempre están.<br>
+                Sensibles al tacto y al frío, ascendiendo y descendiendo van,<br>
+                parte importante del cuerpo, que el hombre debe cuidar.<br>
+                ¿Qué son?
+            </div>
+
+            <div class="bonus-result" id="bonus-result" style="display: none; margin-top: 30px;">
+                <div class="bonus-success">
+                    <h3 style="color: green;">¡Correcto! Has descubierto el secreto</h3>
+                    <p>Aquí tienes una foto muy especial que nadie más ha visto...</p>
+                </div>
+
+                <div class="bonus-secret" style="margin-top: 20px;">
+                    <div class="bonus-secret-container">
+                        <img src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/imagen1.jpeg?v=1746806198958" alt="Foto secreta especial" style="max-width: 100%; border-radius: 8px;">
+                        <p style="font-weight: bold; margin-top: 10px;">Un momento único</p>
+                    </div>
+                    <div class="bonus-secret-container" style="margin-top: 20px;">
+                        <img src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/imagen2.jpeg?v=1746804768095" alt="Foto secreta especial" style="max-width: 100%; border-radius: 8px;">
+                        <p style="font-weight: bold; margin-top: 10px;">Muy especial</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- JS para mostrar/ocultar y validar -->
+<script>
+    document.getElementById("bonus-button").addEventListener("click", function () {
+      const content = document.getElementById("bonus-content");
+      content.style.display = content.style.display === "block" ? "none" : "block";
+    });
+
+    function normalizar(texto) {
+      return texto.normalize("NFD").replace(/\u0300-\u036f/g, "").toLowerCase();
+    }
+
+    document.getElementById("bonus-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const answer = normalizar(document.getElementById("bonus-answer").value.trim());
+      const result = document.getElementById("bonus-result");
+
+      const respuestasValidas = [
+        "testiculos",
+        "huevos",
+        "bolas",
+        "cojones",
+        "joyas de la familia",
+        "pelotas"
+      ];
+
+      if (respuestasValidas.includes(answer)) {
+        result.style.display = "block";
+        confetti({
+          particleCount: 150,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      } else {
+        result.style.display = "none";
+        alert("Respuesta incorrecta. ¡Intenta de nuevo!");
+      }
+    });
+</script>
+
+<!-- Footer -->
+<footer class="footer">
+    <p>Con todo nuestro cariño <span class="heart">❤</span></p>
+    <p>Mayo 2025</p>
+</footer>
+
+<script src="script.js"></script>
+<script>
+    function updateWeddingCounter() {
+      const start = new Date("2025-05-09T13:00:00");
+      const now = new Date();
+      const diff = new Date(now - start);
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = diff.getUTCHours();
+      const minutes = diff.getUTCMinutes();
+      const seconds = diff.getUTCSeconds();
+      const counter = document.getElementById("wedding-counter");
+      if (counter) {
+        counter.textContent = `Llevan casados ${days} días, ${hours} h, ${minutes} min, ${seconds} seg.`;
+      }
+    }
+    setInterval(updateWeddingCounter, 1000);
+</script>
+<script>
+    // <!-- Validación para Puzzle Section 1 -->
+      document.getElementById("check-answers-btn").addEventListener("click", function () {
+        const section = document.getElementById("puzzle-section");
+        const questions = section.querySelectorAll(".puzzle-question");
+        let allCorrect = true;
+
+        questions.forEach((question) => {
+          const correctIndex = parseInt(question.getAttribute("data-correct"));
+          const selected = question.querySelector(".question-option.selected");
+          if (!selected || parseInt(selected.getAttribute("data-index")) !== correctIndex) {
+            allCorrect = false;
+          }
+        });
+
+        const success = section.querySelector("#puzzle-success");
+        const failure = section.querySelector("#puzzle-failure");
+        const gallery = section.querySelector("#secret-gallery");
+
+        if (allCorrect) {
+          success.style.display = "block";
+          failure.style.display = "none";
+          gallery.style.display = "block";
+        } else {
+          success.style.display = "none";
+          failure.style.display = "block";
+          gallery.style.display = "none";
+        }
+      });
+
+      // Validación para Puzzle Section 2
+      document.getElementById("check-answers-btn-2").addEventListener("click", function () {
+        const section = document.getElementById("puzzle-section-2");
+        const questions = section.querySelectorAll(".puzzle-question-2");
+        let allCorrect = true;
+
+        questions.forEach((question) => {
+          const correctIndex = parseInt(question.getAttribute("data-correct"));
+          const selected = question.querySelector(".question-option-2.selected");
+          if (!selected || parseInt(selected.getAttribute("data-index")) !== correctIndex) {
+            allCorrect = false;
+          }
+        });
+
+        const success = section.querySelector("#puzzle-success-2");
+        const failure = section.querySelector("#puzzle-failure-2");
+        const gallery = section.querySelector("#secret-gallery-2");
+        const video = gallery.querySelector("video");
+
+        if (allCorrect) {
+          success.style.display = "block";
+          failure.style.display = "none";
+          gallery.style.display = "block";
+        } else {
+          success.style.display = "none";
+          failure.style.display = "block";
+          gallery.style.display = "none";
+        }
+      });
+
+      // Manejadores de selección
+      document.querySelectorAll(".question-option").forEach((option) => {
+        option.addEventListener("click", () => {
+          const siblings = option.parentElement.querySelectorAll(".question-option");
+          siblings.forEach((sibling) => sibling.classList.remove("selected"));
+          option.classList.add("selected");
+        });
+      });
+
+      document.querySelectorAll(".question-option-2").forEach((option) => {
+        option.addEventListener("click", () => {
+          const siblings = option.parentElement.querySelectorAll(".question-option-2");
+          siblings.forEach((sibling) => sibling.classList.remove("selected"));
+          option.classList.add("selected");
+        });
+      });
+</script>
+</body>
+</html>
