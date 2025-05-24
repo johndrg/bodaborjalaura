@@ -79,7 +79,7 @@
 </section>
 
 <!-- Puzzle Section 1 -->
-<section class="puzzle-section" id="puzzle-section">
+<section class="section puzzle-section" id="puzzle-section"> <!-- Added .section for consistent padding if needed -->
     <div class="container">
         <div class="puzzle-container">
             <i class="fas fa-lock lock-icon"></i>
@@ -155,7 +155,7 @@
                 <h3 class="secret-gallery-heading">
                     Momentos Especiales Desbloqueados
                 </h3>
-                <p>
+                <p class="text-center"> <!-- Added text-center for better alignment -->
                     Has descubierto estas fotos exclusivas que capturan momentos
                     únicos.
                 </p>
@@ -198,7 +198,7 @@
 </section>
 
 <!-- Puzzle Section 2 - Enhanced with Video Integration -->
-<section class="puzzle-section" id="puzzle-section-2">
+<section class="section puzzle-section" id="puzzle-section-2"> <!-- Added .section -->
     <div class="container">
         <div class="puzzle-container">
             <i class="fas fa-lock lock-icon"></i>
@@ -287,7 +287,7 @@
             <!-- Enhanced Video Section -->
             <div class="secret-gallery" id="secret-gallery-2">
                 <h3 class="secret-gallery-heading">Momentos Extra Desbloqueados</h3>
-                <p>Momentos para no olvidarse.</p>
+                <p class="text-center">Momentos para no olvidarse.</p>
 
                 <div class="secret-gallery-container video-gallery-container">
                     <!-- Enhanced Video Player Implementation -->
@@ -299,7 +299,7 @@
                         <video class="video-player"
                                preload="metadata"
                                poster=""
-                               muted>
+                               muted playsinline> <!-- Added playsinline for better mobile experience -->
                             <source src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/VIDEO-2025-05-10-16-51-22.mp4?v=1747850777039"
                                     type="video/mp4">
                             <p>Tu navegador no soporta la reproducción de video HTML5.</p>
@@ -317,7 +317,7 @@
                         <!-- Custom Video Controls -->
                         <div class="video-controls" data-video-controls>
                             <div class="video-controls-bar">
-                                <button class="control-btn" data-play-pause-btn>
+                                <button class="control-btn" data-play-pause-btn aria-label="Reproducir/Pausar">
                                     <i class="fas fa-play"></i>
                                 </button>
 
@@ -329,7 +329,7 @@
                                 <div class="time-display" data-time-display>0:00 / 0:00</div>
 
                                 <div class="volume-container">
-                                    <button class="control-btn" data-mute-btn>
+                                    <button class="control-btn" data-mute-btn aria-label="Silenciar/Activar sonido">
                                         <i class="fas fa-volume-up"></i>
                                     </button>
                                     <input type="range"
@@ -337,17 +337,18 @@
                                            data-volume-slider
                                            min="0"
                                            max="100"
-                                           value="100">
+                                           value="100"
+                                           aria-label="Control de volumen">
                                 </div>
 
-                                <button class="control-btn" data-fullscreen-btn>
+                                <button class="control-btn" data-fullscreen-btn aria-label="Pantalla completa">
                                     <i class="fas fa-expand"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <div class="secret-image-caption">El ritmo</div>
+                    <div class="secret-image-caption">El ritmo</div> <!-- This caption applies to the video player container -->
                 </div>
             </div>
         </div>
@@ -355,40 +356,34 @@
 </section>
 
 <!-- GALERÍA PRINCIPAL SIMPLIFICADA - Momentos Compartidos -->
-<section class="gallery-section" id="gallery-section">
+<section class="section gallery-section" id="gallery-section"> <!-- Added .section -->
     <div class="container">
         <h2 class="gallery-heading">Momentos Compartidos</h2>
 
-        <!-- ESTRUCTURA SIMPLIFICADA PARA LA GALERÍA -->
-        <!-- Para añadir más imágenes, simplemente duplica uno de estos bloques .gallery-item -->
-        <!-- y cambia las URLs de src y data-src por la nueva imagen -->
         <div class="gallery-container" id="gallery-container">
 
-            <!-- IMAGEN 1 -->
             <div class="gallery-item"
                  data-type="image"
                  data-src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/WhatsApp%20Image%202025-05-08%20at%2019.45.42%20(2).jpeg?v=1746728129766">
                 <img src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/WhatsApp%20Image%202025-05-08%20at%2019.45.42%20(2).jpeg?v=1746728129766"
                      alt="Momento especial 1"
-                     class="gallery-img" />
+                     class="gallery-img" loading="lazy" />
             </div>
 
-            <!-- IMAGEN 2 -->
             <div class="gallery-item"
                  data-type="image"
                  data-src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/WhatsApp%20Image%202025-05-08%20at%2019.45.42%20(3).jpeg?v=1746728161348">
                 <img src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/WhatsApp%20Image%202025-05-08%20at%2019.45.42%20(3).jpeg?v=1746728161348"
                      alt="Momento especial 2"
-                     class="gallery-img" />
+                     class="gallery-img" loading="lazy" />
             </div>
 
-            <!-- IMAGEN 3 -->
             <div class="gallery-item"
                  data-type="image"
                  data-src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/WhatsApp%20Image%202025-05-08%20at%2019.45.43.jpeg?v=1746728108125">
                 <img src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/WhatsApp%20Image%202025-05-08%20at%2019.45.43.jpeg?v=1746728108125"
                      alt="Momento especial 3"
-                     class="gallery-img" />
+                     class="gallery-img" loading="lazy" />
             </div>
 
             <div class="gallery-item"
@@ -396,7 +391,7 @@
                  data-src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/WhatsApp%20Image%202025-05-08%20at%2019.55.12.jpeg?v=1746728103230">
                 <img src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/WhatsApp%20Image%202025-05-08%20at%2019.55.12.jpeg?v=1746728103230"
                      alt="Momento especial 4"
-                     class="gallery-img" />
+                     class="gallery-img" loading="lazy" />
             </div>
 
             <div class="gallery-item"
@@ -404,7 +399,7 @@
                  data-src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/WhatsApp%20Image%202025-05-08%20at%2019.45.42.jpeg?v=1746728135331">
                 <img src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/WhatsApp%20Image%202025-05-08%20at%2019.45.42.jpeg?v=1746728135331"
                      alt="Momento especial 5"
-                     class="gallery-img" />
+                     class="gallery-img" loading="lazy" />
             </div>
 
             <div class="gallery-item"
@@ -412,7 +407,7 @@
                  data-src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/3-e55c4fc4.jpg?v=1746783711918">
                 <img src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/3-e55c4fc4.jpg?v=1746783711918"
                      alt="Momento especial 6"
-                     class="gallery-img" />
+                     class="gallery-img" loading="lazy" />
             </div>
 
             <div class="gallery-item"
@@ -420,7 +415,7 @@
                  data-src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/465946741_10231811962833894_3386761079827116128_n.jpg?v=1746783747284">
                 <img src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/465946741_10231811962833894_3386761079827116128_n.jpg?v=1746783747284"
                      alt="Momento especial 7"
-                     class="gallery-img" />
+                     class="gallery-img" loading="lazy" />
             </div>
 
             <div class="gallery-item"
@@ -428,7 +423,7 @@
                  data-src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/465608273_10231751611405146_3050879601457603346_n.jpg?v=1746784278863">
                 <img src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/465608273_10231751611405146_3050879601457603346_n.jpg?v=1746784278863"
                      alt="Momento especial 8"
-                     class="gallery-img" />
+                     class="gallery-img" loading="lazy" />
             </div>
 
             <div class="gallery-item"
@@ -436,7 +431,7 @@
                  data-src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/20230618_211700000_iOS.jpg?v=1746783195150">
                 <img src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/20230618_211700000_iOS.jpg?v=1746783195150"
                      alt="Momento especial 9"
-                     class="gallery-img" />
+                     class="gallery-img" loading="lazy" />
             </div>
 
             <div class="gallery-item"
@@ -444,7 +439,7 @@
                  data-src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/1-e55c4fc4.jpg?v=1746783705330">
                 <img src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/1-e55c4fc4.jpg?v=1746783705330"
                      alt="Momento especial 10"
-                     class="gallery-img" />
+                     class="gallery-img" loading="lazy" />
             </div>
 
             <div class="gallery-item"
@@ -452,68 +447,132 @@
                  data-src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/b70ecb42-6412-47f8-8937-0cb437da92ee.JPG?v=1747854380548">
                 <img src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/b70ecb42-6412-47f8-8937-0cb437da92ee.JPG?v=1747854380548"
                      alt="Momento especial 11"
-                     class="gallery-img" />
+                     class="gallery-img" loading="lazy" />
             </div>
-
-            <!-- IMAGEN 4 - EJEMPLO DE CÓMO AÑADIR MÁS IMÁGENES -->
-            <!-- Descomenta las siguientes líneas y cambia las URLs para añadir una nueva imagen -->
-            <!--
-            <div class="gallery-item"
-                 data-type="image"
-                 data-src="URL_DE_TU_NUEVA_IMAGEN_AQUI">
-                <img src="URL_DE_TU_NUEVA_IMAGEN_AQUI"
-                     alt="Momento especial 4"
-                     class="gallery-img" />
-            </div>
-            -->
-
         </div>
     </div>
 </section>
 
 <!-- Universal Modal for Images and Videos -->
-<div class="modal" id="photo-modal">
-        <span class="close-modal" id="close-modal">
-            <i class="fas fa-times"></i>
-        </span>
+<div class="modal" id="photo-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title-element">
+    <span class="close-modal" id="close-modal" role="button" tabindex="0" aria-label="Cerrar modal">
+        <i class="fas fa-times"></i>
+    </span>
 
-    <div class="modal-spinner" id="modal-spinner"></div>
+    <div class="modal-spinner" id="modal-spinner" role="status" aria-live="polite">
+        <span class="sr-only">Cargando...</span>
+    </div>
 
     <div class="modal-content">
-        <!-- Image Container -->
-        <img src=""
-             alt="Foto expandida"
-             class="modal-img"
-             id="modal-img" />
-
-        <!-- Video Container -->
+        <img src="" alt="" class="modal-img" id="modal-img" /> <!-- Alt will be set by JS -->
         <div class="modal-video-container" id="modal-video-container">
-            <video controls
-                   class="modal-video"
-                   id="modal-video"
-                   preload="metadata">
+            <video controls class="modal-video" id="modal-video" preload="metadata" playsinline>
                 <source src="" type="video/mp4">
                 <p>Tu navegador no soporta la reproducción de video.</p>
             </video>
         </div>
     </div>
 
-    <div class="modal-caption" id="modal-caption">
+    <div class="modal-caption" id="modal-caption" aria-live="polite">
+        <span id="modal-title-element" class="sr-only">Visor de medios</span> <!-- For aria-labelledby -->
         <span id="modal-counter">1/11</span>
     </div>
 
     <div class="modal-nav">
-        <button class="modal-nav-btn" id="prev-photo">
+        <button class="modal-nav-btn" id="prev-photo" aria-label="Medio anterior">
             <i class="fas fa-chevron-left"></i>
         </button>
-        <button class="modal-nav-btn" id="next-photo">
+        <button class="modal-nav-btn" id="next-photo" aria-label="Siguiente medio">
             <i class="fas fa-chevron-right"></i>
         </button>
     </div>
 </div>
 
+<!-- Enlaces de Interés Section -->
+<section class="links-section" id="links-section">
+    <div class="links-container">
+        <h2 class="links-heading">Enlaces de Interés</h2>
+
+        <div class="links-grid">
+            <div class="link-card">
+                <div class="link-icon venue">
+                    <i class="fas fa-church"></i>
+                </div>
+                <div class="link-content">
+                    <h3 class="link-title">Encuentro de Reflexión</h3>
+                    <p class="link-description">
+                        Podéis asistir a la Sala de Tradiciones de Vigo, donde tendrá
+                        lugar una reunión, seguido de un tiempo de convivencia en el
+                        Espacio de los Doce Pasos. Consulta todos los detalles sobre
+                        puntos de encuentro y el programa de "Solo por hoy".
+                    </p>
+                    <a href="https://www.alcoholicos-anonimos.org" class="link-button"
+                    >Me interesa</a
+                    >
+                </div>
+            </div>
+
+            <div class="link-card">
+                <div class="link-icon gift">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <div class="link-content">
+                    <h3 class="link-title">Lista de Regalos</h3>
+                    <p class="link-description">
+                        Si deseas hacerles un regalo a los novios, aquí encontrarás su
+                        lista de bodas.
+                    </p>
+                    <a
+                            href="https://www.chollometro.com/categorias/mascotas"
+                            class="link-button"
+                    >Ver lista de regalos</a
+                    >
+                </div>
+            </div>
+
+            <div class="link-card">
+                <div class="link-icon hotel">
+                    <i class="fas fa-bed"></i>
+                </div>
+                <div class="link-content">
+                    <h3 class="link-title">Alojamiento</h3>
+                    <p class="link-description">
+                        Hemos negociado tarifas especiales para los invitados en varios
+                        hoteles cercanos. Reserva con el código "BorjaLaura2025" para
+                        obtener descuento.
+                    </p>
+                    <a
+                            href="https://www.idealista.com/venta-viviendas/la-moraleja/la-moraleja-urbanizacion/"
+                            class="link-button"
+                    >Ver opciones</a
+                    >
+                </div>
+            </div>
+
+            <div class="link-card">
+                <div class="link-icon aventure">
+                    <i class="fas fa-vr-cardboard"></i>
+                </div>
+                <div class="link-content">
+                    <h3 class="link-title">Experiencia</h3>
+                    <p class="link-description">
+                        Disfrutad de una experiencia única!
+                        No todo el mundo tiene la oportunidad de disfrutarlo!
+                    </p>
+                    <a
+                            href="https://kinepolis.es/3d/"
+                            class="link-button"
+                    >Reservar aventura</a
+                    >
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
 <!-- Bonus Track Section -->
-<section class="bonus-section" id="bonus-section">
+<section class="section bonus-section" id="bonus-section"> <!-- Added .section -->
     <div class="bonus-container">
         <button class="bonus-button" id="bonus-button">
             <i class="fas fa-star"></i> Bonus Track
@@ -522,35 +581,36 @@
         <div class="bonus-content" id="bonus-content">
             <div class="bonus-image-container">
                 <img src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/cubo.jpeg?v=1746790810820"
-                     alt="Foto misteriosa"
+                     alt="Foto misteriosa con un objeto oculto"
                      class="bonus-image">
-            </div>
 
-            <div class="bonus-question">
-                <p>¿No notas nada extraño en la foto?</p>
-            </div>
+                <div class="bonus-question">
+                    <p>¿No notas nada extraño en la foto?</p>
+                </div>
 
-            <form class="bonus-form" id="bonus-form">
-                <input type="text"
-                       class="bonus-input"
-                       id="bonus-answer"
-                       placeholder="Escribe aquí tu respuesta..."
-                       autocomplete="off">
-                <button type="submit" class="bonus-submit">
-                    Comprobar
-                </button>
-            </form>
+                <form class="bonus-form" id="bonus-form" role="search">
+                    <label for="bonus-answer" class="sr-only">Tu respuesta a la pregunta bonus</label>
+                    <input type="text"
+                           class="bonus-input"
+                           id="bonus-answer"
+                           placeholder="Escribe aquí tu respuesta..."
+                           autocomplete="off">
+                    <button type="submit" class="bonus-submit">
+                        Comprobar
+                    </button>
+                </form>
 
-            <!-- Hint Section -->
-            <div class="bonus-hint">
-                Pista: Dos hermanos inseparables, en bolsa protegidos van,<br>
-                guardianes de la vida futura, en conjunto siempre están.<br>
-                Sensibles al tacto y al frío, ascendiendo y descendiendo van,<br>
-                parte importante del cuerpo, que el hombre debe cuidar.<br>
-                ¿Qué son?
-            </div>
+                <div class="bonus-hint">
+                    Pista: Dos hermanos inseparables, en bolsa protegidos van,<br>
+                    guardianes de la vida futura, en conjunto siempre están.<br>
+                    Sensibles al tacto y al frío, ascendiendo y descendiendo van,<br>
+                    parte importante del cuerpo, que el hombre debe cuidar.<br>
+                    ¿Qué son?
+                </div>
+            </div> <!-- End of bonus-image-container which has white background -->
 
-            <div class="bonus-result" id="bonus-result">
+
+            <div class="bonus-result" id="bonus-result"> <!-- This part is outside white box, on dark bg -->
                 <div class="bonus-success">
                     <h3>¡Correcto! Has descubierto el secreto</h3>
                     <p>Aquí tienes una foto muy especial que nadie más ha visto...</p>
@@ -559,13 +619,13 @@
                 <div class="bonus-secret">
                     <div class="bonus-secret-container">
                         <img src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/imagen1.jpeg?v=1746806198958"
-                             alt="Foto secreta especial"
+                             alt="Foto secreta especial revelada 1"
                              class="bonus-secret-image">
                         <p class="bonus-secret-caption">Un momento único</p>
                     </div>
                     <div class="bonus-secret-container">
                         <img src="https://cdn.glitch.global/12c5be14-329d-4675-b049-0767802f135f/imagen2.jpeg?v=1746804768095"
-                             alt="Foto secreta especial"
+                             alt="Foto secreta especial revelada 2"
                              class="bonus-secret-image">
                         <p class="bonus-secret-caption">Muy especial</p>
                     </div>
@@ -577,7 +637,7 @@
 
 <!-- Footer -->
 <footer class="footer">
-    <p>Con todo nuestro cariño <span class="heart">❤</span></p>
+    <p>Con todo nuestro cariño <span class="heart" aria-hidden="true">❤</span></p>
     <p>Mayo 2025</p>
 </footer>
 

@@ -390,8 +390,10 @@ button {
 .question-option-2.selected {
   background-color: rgba(15, 52, 96, 0.1);
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(142, 68, 173, 0.3);
+  box-shadow: 0 0 0 3px rgba(142, 68, 173, 0.3); /* Color was purple-ish, changed for consistency */
+  /* Consider: box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent); */
 }
+
 
 .option-image {
   max-width: 120px;
@@ -463,7 +465,7 @@ button {
    SECRET GALLERY - Sistema de galería desbloqueada CORREGIDO
    ======================================================================== */
 .secret-gallery {
-  display: none;
+  display: none; /* Initially hidden, JS will show it */
   margin-top: var(--spacing-xl);
 }
 
@@ -482,18 +484,19 @@ button {
   margin-top: var(--spacing-lg);
 }
 
-.video-gallery-container {
-  grid-template-columns: 1fr;
+.video-gallery-container { /* Specific for the video in puzzle 2 */
+  grid-template-columns: 1fr; /* Ensure video player takes full width if it's the only item */
   justify-items: center;
 }
 
 /* FIXED: Secret image containers animation */
-.secret-image-container {
+.secret-image-container,
+.video-player-container.revealed { /* Apply reveal to video player as well if it's in a secret gallery */
   overflow: hidden;
   border-radius: 8px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s ease, opacity 0.6s var(--ease-out-cubic), transform 0.6s var(--ease-out-cubic);
   /* INICIO: Invisible por defecto */
   opacity: 0;
   transform: scale(0.8) translateY(20px);
@@ -502,12 +505,14 @@ button {
 }
 
 /* FIXED: Estado revelado con animación */
-.secret-image-container.revealed {
+.secret-image-container.revealed,
+.video-player-container.revealed { /* Apply reveal to video player as well */
   opacity: 1;
   transform: scale(1) translateY(0);
   visibility: visible;
   animation: popIn 0.6s var(--ease-in-out-cubic) forwards;
 }
+
 
 .secret-image-container:hover {
   transform: translateY(-10px) scale(1.02);
@@ -545,12 +550,12 @@ button {
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-  cursor: pointer;
+  cursor: default; /* Default cursor, specific elements get pointer */
   transition: transform 0.3s ease;
 }
 
 .video-player-container:hover {
-  transform: scale(1.02);
+  /* transform: scale(1.02); Optional hover effect */
 }
 
 .video-player {
@@ -558,7 +563,8 @@ button {
   height: auto;
   display: block;
   background: #000;
-  min-height: 300px;
+  min-height: 300px; /* Ensure some height even before metadata loads */
+  border-radius: inherit; /* Inherit border radius if container has one and video is flush */
 }
 
 /* Video Overlay */
@@ -583,7 +589,7 @@ button {
   pointer-events: none;
 }
 
-.play-button {
+.play-button { /* This is the big play button on the overlay */
   width: 80px;
   height: 80px;
   background: rgba(255, 255, 255, 0.9);
@@ -606,7 +612,7 @@ button {
 .play-button i {
   font-size: 2rem;
   color: var(--accent);
-  margin-left: 4px;
+  margin-left: 4px; /* Small adjustment for play icon centering */
 }
 
 .video-title {
@@ -632,34 +638,36 @@ button {
   left: 0;
   width: 100%;
   background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
-  padding: var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-md); /* Adjusted padding */
   opacity: 0;
-  transition: opacity 0.3s ease;
+  visibility: hidden; /* Use visibility for better performance with opacity */
+  transition: opacity 0.3s ease, visibility 0.3s ease;
   z-index: 20;
 }
 
 .video-player-container:hover .video-controls,
 .video-controls.visible {
   opacity: 1;
+  visibility: visible;
 }
 
 .video-controls-bar {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm); /* Adjusted gap */
 }
 
 .control-btn {
   background: none;
   border: none;
   color: white;
-  font-size: 1.2rem;
+  font-size: 1.2rem; /* Adjust as needed */
   cursor: pointer;
   padding: var(--spacing-xs);
   border-radius: 4px;
   transition: all 0.2s ease;
-  min-width: 40px;
-  height: 40px;
+  min-width: 36px; /* Smaller min-width */
+  height: 36px;  /* Smaller height */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -673,47 +681,49 @@ button {
 /* Progress Bar */
 .progress-container {
   flex: 1;
-  height: 6px;
+  height: 8px; /* Slightly thicker for better touch/click */
   background: rgba(255, 255, 255, 0.3);
-  border-radius: 3px;
+  border-radius: 4px; /* Matched height/2 */
   cursor: pointer;
   position: relative;
-  margin: 0 var(--spacing-sm);
+  margin: 0 var(--spacing-xs); /* Adjusted margin */
 }
 
 .progress-bar {
   height: 100%;
   background: linear-gradient(90deg, var(--highlight), #ff6b8a);
-  border-radius: 3px;
+  border-radius: inherit; /* Inherit from container */
   width: 0%;
-  transition: width 0.1s ease;
+  transition: width 0.1s linear; /* Use linear for smoother updates during seek */
   position: relative;
 }
 
 .progress-handle {
   position: absolute;
-  right: -6px;
+  right: -6px; /* Half of its width to center it on the bar end */
   top: 50%;
   transform: translateY(-50%);
-  width: 12px;
-  height: 12px;
+  width: 14px; /* Slightly larger handle */
+  height: 14px;
   background: white;
   border-radius: 50%;
-  opacity: 0;
+  opacity: 0; /* Initially hidden */
   transition: opacity 0.2s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-.progress-container:hover .progress-handle {
+.progress-container:hover .progress-handle,
+.video-player-container.dragging .progress-handle { /* Show when dragging too */
   opacity: 1;
 }
 
 .time-display {
   color: white;
   font-size: 0.9rem;
-  min-width: 80px;
-  text-align: center;
-  font-family: 'Courier New', monospace;
+  min-width: 90px; /* Adjusted for MM:SS / MM:SS format */
+  text-align: right; /* Align to right before volume controls */
+  font-family: 'Courier New', monospace; /* Monospaced for consistent width */
+  padding-right: var(--spacing-xs);
 }
 
 /* Volume Controls */
@@ -724,36 +734,62 @@ button {
 }
 
 .volume-slider {
-  width: 60px;
-  height: 3px;
+  width: 70px; /* Slightly wider */
+  height: 5px; /* Match progress bar style a bit */
   background: rgba(255, 255, 255, 0.3);
-  border-radius: 2px;
+  border-radius: 3px;
   outline: none;
   cursor: pointer;
   -webkit-appearance: none;
   appearance: none;
+  transition: box-shadow 0.2s ease;
+}
+.volume-slider:hover {
+    box-shadow: 0 0 5px rgba(255,255,255,0.5);
 }
 
 .volume-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 12px;
-  height: 12px;
+  width: 14px; /* Match handle style */
+  height: 14px;
   background: white;
   border-radius: 50%;
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  margin-top: -4.5px; /* Vertically center thumb on track */
 }
 
 .volume-slider::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   background: white;
   border-radius: 50%;
   cursor: pointer;
   border: none;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
+
+.video-player-container.video-buffering .video-overlay::after {
+    content: '';
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    /* Position it in the center or corner as preferred */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    /* Ensure it's visible even if play button is there */
+    z-index: 11; /* Above overlay content but below controls if overlay is hidden */
+}
+.video-player-container.video-buffering .play-button {
+    display: none; /* Hide play button during buffering if spinner is shown */
+}
+
 
 /* ========================================================================
    GALLERY SECTION SIMPLIFICADA - Sistema de galería más simple
@@ -850,7 +886,7 @@ button {
    MODAL SYSTEM - Sistema modal unificado para imágenes y videos
    ======================================================================== */
 .modal {
-  display: none;
+  display: none; /* Changed by JS to flex */
   position: fixed;
   top: 0;
   left: 0;
@@ -860,31 +896,32 @@ button {
   z-index: var(--z-index-modal);
   opacity: 0;
   transition: opacity 0.3s ease;
-  overflow: hidden;
+  overflow: hidden; /* Prevent scrollbars on modal itself */
   backdrop-filter: blur(5px);
+  align-items: center; /* Added for flex display */
+  justify-content: center; /* Added for flex display */
 }
 
 .modal.active {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: flex; /* Activates flexbox for centering */
   opacity: 1;
 }
 
 .modal-content {
   position: relative;
   max-width: 90%;
-  max-height: 85vh;
-  display: flex;
+  max-height: 85vh; /* Ensure it fits viewport vertically */
+  display: flex; /* For centering image/video if they don't fill max-width/height */
   justify-content: center;
   align-items: center;
+  /* No explicit width/height, let content dictate up to max values */
 }
 
 .modal-img,
 .modal-video-container {
-  max-width: 100%;
-  max-height: 85vh;
-  object-fit: contain;
+  max-width: 100%; /* Max width of parent .modal-content */
+  max-height: 100%; /* Max height of parent .modal-content (which is 85vh) */
+  object-fit: contain; /* Ensure full image/video is visible */
   border-radius: 8px;
   opacity: 0;
   transform: scale(0.95);
@@ -898,22 +935,29 @@ button {
   transform: scale(1);
 }
 
-.modal-video {
-  width: 100%;
-  height: auto;
-  max-height: 85vh;
-  border-radius: 8px;
+.modal-video { /* The actual video element inside its container */
+  width: 100%; /* Fill its container */
+  height: auto; /* Maintain aspect ratio */
+  max-height: 85vh; /* Redundant if container is already limited, but safe */
+  border-radius: 8px; /* Match container styling */
+  display: block; /* Remove extra space below video */
 }
+
 
 .modal-spinner {
   position: absolute;
+  /* Centered on the modal-content area, or on the modal itself */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 50px;
   height: 50px;
   border: 3px solid rgba(233, 69, 96, 0.2);
   border-top: 3px solid var(--highlight);
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  display: none;
+  display: none; /* Shown by JS */
+  z-index: var(--z-index-modal-content); /* Above content if needed */
 }
 
 .close-modal {
@@ -922,14 +966,14 @@ button {
   right: 20px;
   width: 50px;
   height: 50px;
-  background-color: rgba(233, 69, 96, 0.2);
+  background-color: rgba(233, 69, 96, 0.2); /* Original: highlight, changed to less obtrusive */
   color: white;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  z-index: var(--z-index-modal-content);
+  z-index: var(--z-index-modal-content); /* Ensure it's above modal content */
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
 }
@@ -942,8 +986,9 @@ button {
 .modal-nav {
   position: absolute;
   bottom: 30px;
-  left: 0;
-  width: 100%;
+  left: 50%; /* Center the nav container */
+  transform: translateX(-50%); /* Fine-tune centering */
+  width: auto; /* Fit content */
   display: flex;
   justify-content: center;
   gap: 30px;
@@ -971,10 +1016,10 @@ button {
   transform: scale(1.1);
 }
 
-.modal-caption {
+.modal-caption { /* Renamed from .modal-counter to reflect its role as caption/counter */
   position: absolute;
-  bottom: 30px;
-  left: 30px;
+  bottom: 30px; /* Match nav buttons */
+  left: 30px;  /* Position to the left */
   color: white;
   background-color: rgba(0, 0, 0, 0.7);
   padding: var(--spacing-xs) var(--spacing-md);
@@ -983,6 +1028,7 @@ button {
   z-index: var(--z-index-modal-content);
   backdrop-filter: blur(10px);
 }
+
 
 /* ========================================================================
    BONUS SECTION - Sección bonus interactiva
@@ -1053,12 +1099,12 @@ button {
 .bonus-content {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.8s ease;
+  transition: max-height 0.8s ease-in-out; /* Smoother transition */
   margin-top: var(--spacing-lg);
 }
 
 .bonus-content.revealed {
-  max-height: 2000px;
+  max-height: 2000px; /* Ensure enough height for content */
 }
 
 .bonus-image-container {
@@ -1070,7 +1116,7 @@ button {
   margin: 0 auto;
   opacity: 0;
   transform: translateY(20px);
-  transition: all 0.5s ease 0.4s;
+  transition: opacity 0.5s ease 0.2s, transform 0.5s ease 0.2s; /* Delay opacity/transform until after max-height */
 }
 
 .bonus-content.revealed .bonus-image-container {
@@ -1082,6 +1128,7 @@ button {
   width: 100%;
   border-radius: 8px;
   margin-bottom: var(--spacing-sm);
+  display: block; /* Prevents extra space under image */
 }
 
 .bonus-question {
@@ -1109,6 +1156,7 @@ button {
   font-size: 1rem;
   transition: all 0.3s ease;
   background: white;
+  color: var(--primary); /* Ensure text is visible */
 }
 
 .bonus-input:focus {
@@ -1136,31 +1184,53 @@ button {
 
 .bonus-hint {
   font-size: 0.9rem;
-  color: var(--accent);
+  color: var(--accent); /* Changed from light for better contrast on white background */
   margin-top: var(--spacing-sm);
   font-style: italic;
-  display: none;
-  opacity: 0;
+  display: none; /* Controlled by JS */
+  opacity: 0; /* For transition */
   transition: opacity 0.5s ease;
+  /* Ensure this is styled for the white .puzzle-container like background */
+  /* This hint is inside .bonus-image-container which is white */
 }
 
+
 .bonus-hint.visible {
-  display: block;
+  display: block; /* Or inline, depending on desired layout */
   opacity: 1;
 }
 
 .bonus-result {
+  /* This element is inside .bonus-content. Its visibility is controlled by .revealed on .bonus-content.
+     If it needs its own max-height transition, ensure it also gets a .revealed class
+     or that .bonus-content.revealed .bonus-result manages display. */
+  /* For direct control:
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.8s ease;
-  margin-top: 0;
+  */
+  margin-top: var(--spacing-lg); /* Add some space above the result images */
+  display: none; /* Initially hidden, JS will show if answer is correct */
 }
 
-.bonus-result.revealed {
-  max-height: 3000px;
+.bonus-result.revealed { /* Add this class via JS to show */
+  display: block; /* Or grid/flex */
+  /* max-height: 3000px; */ /* If using max-height transition for this specific block */
 }
 
-.bonus-secret {
+.bonus-success { /* Text part of the success message */
+    margin-bottom: var(--spacing-lg);
+}
+.bonus-success h3 {
+    color: var(--light); /* Light color for dark background */
+    font-family: var(--font-family-serif);
+}
+.bonus-success p {
+    color: var(--medium);
+}
+
+
+.bonus-secret { /* Container for the two secret images */
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-lg);
@@ -1168,20 +1238,20 @@ button {
   margin-top: var(--spacing-lg);
 }
 
-.bonus-secret-container {
-  margin-bottom: var(--spacing-lg);
+.bonus-secret-container { /* Individual image + caption wrapper */
+  margin-bottom: var(--spacing-lg); /* Or remove if gap is enough */
   width: 100%;
   text-align: center;
 }
 
 .bonus-secret-image {
   width: 100%;
-  max-width: 400px;
+  max-width: 400px; /* Limit size if needed */
   height: auto;
   border-radius: 8px;
   box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
-  border: 10px solid rgba(255, 255, 255, 0.1);
-  display: inline-block;
+  border: 10px solid rgba(255, 255, 255, 0.1); /* Decorative border */
+  display: inline-block; /* If text-align: center is used on parent */
 }
 
 .bonus-secret-caption {
@@ -1258,12 +1328,14 @@ button {
   0% {
     opacity: 0;
     transform: scale(0.7) translateY(30px);
-    visibility: hidden;
+    visibility: hidden; /* Ensure it's hidden before animation starts */
+  }
+  1% { /* Start with visibility: visible to allow animation */
+    visibility: visible;
   }
   50% {
     opacity: 0.8;
     transform: scale(1.05) translateY(-5px);
-    visibility: visible;
   }
   100% {
     opacity: 1;
@@ -1395,12 +1467,12 @@ button {
 @media (max-width: 768px) {
   /* Typography adjustments */
   .names {
-    font-size: 3rem;
+    font-size: 2.5rem; /* Slightly smaller for very small screens */
     text-align: center;
   }
 
   .ampersand {
-    font-size: 4rem;
+    font-size: 3.5rem; /* Adjusted */
     display: block;
     margin: var(--spacing-xs) 0;
   }
@@ -1415,7 +1487,7 @@ button {
   }
 
   .letter-heading {
-    font-size: 2rem;
+    font-size: 1.8rem; /* Adjusted */
   }
 
   .quote {
@@ -1425,15 +1497,40 @@ button {
 
   /* Gallery adjustments */
   .gallery-container {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr; /* Two columns on tablets */
     gap: var(--spacing-md);
     padding: 0 var(--spacing-sm);
   }
 
   /* Modal adjustments */
   .modal {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-sm); /* Less padding on small screens */
   }
+  .modal-content {
+    max-width: 95%; /* Allow more width */
+    max-height: 90vh; /* Allow more height */
+  }
+  .close-modal {
+    top: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+  }
+  .modal-nav {
+    bottom: 15px;
+    gap: var(--spacing-md);
+  }
+  .modal-nav-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+  .modal-caption {
+    bottom: 15px;
+    left: 15px;
+    font-size: 0.8rem;
+  }
+
 
   /* Puzzle adjustments */
   .puzzle-container {
@@ -1441,32 +1538,45 @@ button {
   }
 
   .puzzle-title {
-    font-size: 2rem;
+    font-size: 1.8rem; /* Adjusted */
   }
 
   .secret-gallery-container {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* Single column for secret items on mobile */
   }
 
   /* Video player adjustments */
   .video-player-container {
-    margin: var(--spacing-sm);
+    margin-left: 0; /* Remove side margins if it's full width in single column */
+    margin-right: 0;
   }
 
   .video-controls-bar {
-    flex-wrap: wrap;
-    gap: var(--spacing-sm);
+    flex-wrap: wrap; /* Allow controls to wrap */
+    justify-content: center; /* Center wrapped items */
+    gap: var(--spacing-xs);
+  }
+  .progress-container {
+    flex-basis: 100%; /* Make progress bar full width when wrapped */
+    order: -1; /* Move progress bar to top in wrapped layout */
+    margin-bottom: var(--spacing-sm);
+  }
+  .time-display {
+    min-width: auto; /* Allow time to shrink if needed */
+    padding-right: 0;
   }
 
   .volume-container {
-    order: 3;
-    flex: 1 0 100%;
-    justify-content: center;
+    /* order: 3; already there in original */
+    /* flex: 1 0 100%; already there in original */
+    /* justify-content: center; already there in original */
+    /* No changes needed if these are desired, but check if it causes issues with wrap */
   }
+
 
   /* Bonus section adjustments */
   .bonus-secret {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* Single column for bonus images */
   }
 
   .bonus-form {
@@ -1476,26 +1586,33 @@ button {
   .bonus-input,
   .bonus-submit {
     width: 100%;
+    max-width: none; /* Allow full width */
   }
 }
 
 @media (max-width: 576px) {
   .gallery-container {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* Single column on small mobile */
+  }
+  .names {
+    font-size: 2rem;
+  }
+  .ampersand {
+    font-size: 3rem;
   }
 
   .video-player-container {
-    margin: var(--spacing-xs);
+    /* margin: var(--spacing-xs);  From original, could be 0 for full width items */
   }
 
   .modal-nav {
-    bottom: 20px;
-    gap: var(--spacing-lg);
+    bottom: 10px;
+    gap: var(--spacing-sm);
   }
 
   .modal-nav-btn {
-    width: 40px;
-    height: 40px;
+    width: 35px;
+    height: 35px;
   }
 }
 
@@ -1519,13 +1636,173 @@ button {
 }
 
 .hidden {
-  display: none;
+  display: none !important; /* Ensure it overrides other display properties */
 }
 
-.visible {
-  display: block;
+.visually-hidden { /* For accessible hiding, replaces .hidden if content should be readable by screen readers */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+
+.visible { /* Not typically used, display is usually 'block', 'flex', etc. */
+  display: block; /* Or appropriate display type */
 }
 
 .no-scroll {
+  overflow: hidden; /* Applied to body when modal is open */
+}
+
+/* Enlaces de Interés Styles */
+.links-section {
+  background-color: var(--light);
+  padding: 5rem 2rem;
+  position: relative;
   overflow: hidden;
+}
+
+.links-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--primary) 0%, transparent 100%);
+  opacity: 0.05;
+  z-index: 0;
+}
+
+.links-container {
+  position: relative;
+  z-index: 1;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.links-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3rem;
+  font-weight: 300;
+  text-align: center;
+  color: var(--accent);
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.links-heading:after {
+  content: '';
+  position: absolute;
+  bottom: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 1px;
+  background-color: var(--highlight);
+}
+
+.links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.link-card {
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  transform: translateY(20px);
+  opacity: 0;
+  animation: fadeUp 0.8s ease forwards;
+}
+
+.link-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.link-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.link-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.link-card:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+.link-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.link-icon {
+  height: 120px;
+  background-color: var(--accent);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 3rem;
+  color: white;
+}
+
+.link-icon.venue {
+  background-color: #5e548e;
+}
+
+.link-icon.gift {
+  background-color: #9f86c0;
+}
+
+.link-icon.hotel {
+  background-color: #be95c4;
+}
+
+.link-icon.transport {
+  background-color: #e0b1cb;
+}
+
+.link-content {
+  padding: 2rem;
+}
+
+.link-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+
+.link-description {
+  color: var(--primary);
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.link-button {
+  display: inline-block;
+  padding: 0.8rem 1.5rem;
+  background-color: var(--accent);
+  color: white;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.link-button:hover {
+  background-color: var(--highlight);
+  transform: translateY(-2px);
 }

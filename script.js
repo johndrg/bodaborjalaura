@@ -139,9 +139,14 @@ class EnhancedVideoPlayer {
    * Initialize video player with event listeners and setup
    */
   initialize() {
+    if (!this.video) {
+        console.error('Video element not found in container:', this.container);
+        return;
+    }
     this.setupEventListeners();
     this.setupKeyboardControls();
     this.updateTimeDisplay();
+    this.updateVolumeUI(); // Initialize volume UI correctly
 
     // Hide controls initially
     this.hideControlsAfterDelay();
@@ -232,6 +237,7 @@ class EnhancedVideoPlayer {
 
     this.video.addEventListener('loadedmetadata', () => {
       this.updateTimeDisplay();
+      this.updateVolumeUI(); // Ensure volume UI is correct on load
     });
 
     this.video.addEventListener('timeupdate', () => {
@@ -330,15 +336,43 @@ class EnhancedVideoPlayer {
    */
   setupKeyboardControls() {
     document.addEventListener('keydown', (e) => {
-      // Only handle keys if this video is in focus or modal is open
-      if (!this.container.matches(':hover') && !document.querySelector('.modal.active')) {
+      const isThisPlayerFullscreen = document.fullscreenElement === this.container;
+      const isAnyModalActive = !!document.querySelector('.modal.active');
+
+      let shouldHandleEvent = false;
+      if (isThisPlayerFullscreen) {
+        shouldHandleEvent = true; // Always handle if this player is fullscreen
+      } else if (this.container.matches(':hover') && !isAnyModalActive) {
+        // Handle if hovered AND no general modal is active
+        shouldHandleEvent = true;
+      }
+
+      if (!shouldHandleEvent) {
         return;
       }
 
+      // If focus is on an input field, don't trigger video shortcuts
+      const activeElement = document.activeElement;
+      if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA' || activeElement.isContentEditable)) {
+          if (e.code === 'Space' && activeElement.tagName !== 'BUTTON') { // Allow space for button "click"
+             // Don't prevent default if typing space in an input
+          } else {
+            // For other keys, if focus is on input, let default behavior happen for inputs.
+            // For Space on non-buttons, it might type a space. For other keys, they might be input characters.
+            // This logic might need refinement based on specific UX goals for inputs vs. player shortcuts.
+            // For now, if it's an input, and not space on a button, we might not want player shortcuts.
+            // However, the initial `shouldHandleEvent` check is primary. This is a sub-condition.
+          }
+      }
+
+
       switch (e.code) {
         case 'Space':
-          e.preventDefault();
-          this.togglePlay();
+          // Prevent space from scrolling page if player is focused/active
+          if (shouldHandleEvent) { // Re-check, as activeElement logic might modify intent
+            e.preventDefault();
+            this.togglePlay();
+          }
           break;
         case 'ArrowLeft':
           e.preventDefault();
@@ -350,7 +384,7 @@ class EnhancedVideoPlayer {
           break;
         case 'ArrowUp':
           e.preventDefault();
-          this.adjustVolume(CONFIG.VIDEO_SEEK_STEP);
+          this.adjustVolume(CONFIG.VOLUME_STEP); // CORRECTED: Use VOLUME_STEP
           break;
         case 'ArrowDown':
           e.preventDefault();
@@ -373,6 +407,7 @@ class EnhancedVideoPlayer {
    * @param {MouseEvent} e - Mouse event
    */
   startDragging(e) {
+    if (!this.video) return;
     this.isDragging = true;
     this.wasPlayingBeforeDrag = !this.video.paused;
 
@@ -391,7 +426,7 @@ class EnhancedVideoPlayer {
    * Stop dragging operation for progress bar
    */
   stopDragging() {
-    if (!this.isDragging) return;
+    if (!this.isDragging || !this.video) return;
 
     this.isDragging = false;
 
@@ -408,6 +443,7 @@ class EnhancedVideoPlayer {
    * Toggle play/pause state
    */
   togglePlay() {
+    if (!this.video) return;
     if (this.video.paused) {
       this.play();
     } else {
@@ -419,15 +455,17 @@ class EnhancedVideoPlayer {
    * Play video
    */
   play() {
+    if (!this.video) return;
     const playPromise = this.video.play();
 
     if (playPromise !== undefined) {
       playPromise.then(() => {
-        this.isPlaying = true;
-        this.hideOverlay();
-        this.updatePlayButton();
+        // this.isPlaying is set by 'play' event listener (onPlay)
       }).catch(error => {
         console.error('Error playing video:', error);
+        // Ensure UI reflects paused state on error
+        this.isPlaying = false;
+        this.updatePlayButton();
       });
     }
   }
@@ -436,9 +474,9 @@ class EnhancedVideoPlayer {
    * Pause video
    */
   pause() {
+    if (!this.video) return;
     this.video.pause();
-    this.isPlaying = false;
-    this.updatePlayButton();
+    // this.isPlaying is set by 'pause' event listener (onPause)
   }
 
   /**
@@ -462,6 +500,7 @@ class EnhancedVideoPlayer {
    * Handle video end event
    */
   onVideoEnd() {
+    if (!this.video) return;
     this.isPlaying = false;
     this.showOverlay();
     this.updatePlayButton();
@@ -475,38 +514,36 @@ class EnhancedVideoPlayer {
   toggleMute() {
     if (this.video) {
       this.video.muted = !this.video.muted;
-      this.updateVolumeUI();
+      // volumechange event will trigger updateVolumeUI
     }
   }
 
   /**
    * Set volume level
-   * @param {number} value - Volume value (0-100)
+   * @param {number} value - Volume value (0-100 from slider)
    */
   setVolume(value) {
     if (this.video) {
-      const volume = value / 100;
+      const volume = parseFloat(value) / 100;
       this.video.volume = volume;
       this.video.muted = volume === 0;
-      this.updateVolumeUI();
+      // volumechange event will trigger updateVolumeUI
     }
   }
 
   /**
    * Adjust volume by relative amount
-   * @param {number} delta - Volume change amount (-1 to 1)
+   * @param {number} delta - Volume change amount (-0.1 to 0.1)
    */
   adjustVolume(delta) {
     if (this.video) {
-      const newVolume = Math.max(0, Math.min(1, this.video.volume + delta));
+      let newVolume = this.video.volume + delta;
+      newVolume = Math.max(0, Math.min(1, newVolume)); // Clamp between 0 and 1
+
       this.video.volume = newVolume;
       this.video.muted = newVolume === 0;
 
-      if (this.volumeSlider) {
-        this.volumeSlider.value = newVolume * 100;
-      }
-
-      this.updateVolumeUI();
+      // volumechange event will trigger updateVolumeUI, which updates slider
     }
   }
 
@@ -515,11 +552,12 @@ class EnhancedVideoPlayer {
    * @param {MouseEvent} e - Mouse event for position calculation
    */
   seekTo(e) {
-    if (this.video && this.progressContainer) {
+    if (this.video && this.progressContainer && this.video.duration) {
       const rect = this.progressContainer.getBoundingClientRect();
       const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
       this.video.currentTime = percent * this.video.duration;
-      this.updateProgress();
+      this.updateProgress(); // Immediate feedback for dragging
+      this.updateTimeDisplay();
     }
   }
 
@@ -528,10 +566,10 @@ class EnhancedVideoPlayer {
    * @param {number} seconds - Seconds to seek (positive or negative)
    */
   seekRelative(seconds) {
-    if (this.video) {
+    if (this.video && this.video.duration) {
       const newTime = Math.max(0, Math.min(this.video.duration, this.video.currentTime + seconds));
       this.video.currentTime = newTime;
-      this.updateProgress();
+      // timeupdate event will trigger progress and time display updates
     }
   }
 
@@ -540,10 +578,15 @@ class EnhancedVideoPlayer {
    */
   toggleFullscreen() {
     try {
-      if (document.fullscreenElement) {
-        document.exitFullscreen();
-      } else {
+      if (!document.fullscreenElement) {
+        // If video element itself is meant to go fullscreen:
+        // this.video.requestFullscreen();
+        // If container is meant to go fullscreen:
         this.container.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
       }
     } catch (error) {
       console.error('Fullscreen error:', error);
@@ -554,9 +597,11 @@ class EnhancedVideoPlayer {
    * Update progress bar visual state
    */
   updateProgress() {
-    if (this.video && this.progressBar && this.video.duration) {
+    if (this.video && this.progressBar && this.video.duration > 0) {
       const percent = (this.video.currentTime / this.video.duration) * 100;
       this.progressBar.style.width = `${percent}%`;
+    } else if (this.progressBar) {
+      this.progressBar.style.width = '0%';
     }
   }
 
@@ -566,7 +611,7 @@ class EnhancedVideoPlayer {
   updateTimeDisplay() {
     if (this.video && this.timeDisplay) {
       const current = formatTime(this.video.currentTime);
-      const duration = formatTime(this.video.duration);
+      const duration = formatTime(this.video.duration || 0);
       this.timeDisplay.textContent = `${current} / ${duration}`;
     }
   }
@@ -575,13 +620,20 @@ class EnhancedVideoPlayer {
    * Update play button icon
    */
   updatePlayButton() {
-    const icon = this.isPlaying ? 'fa-pause' : 'fa-play';
+    const iconClass = this.isPlaying ? 'fa-pause' : 'fa-play';
 
     if (this.playPauseBtn) {
       const iconElement = this.playPauseBtn.querySelector('i');
       if (iconElement) {
-        iconElement.className = `fas ${icon}`;
+        iconElement.className = `fas ${iconClass}`;
       }
+    }
+    // Also update the main overlay play button if it exists and is used
+    if (this.playButton) {
+        const overlayIconElement = this.playButton.querySelector('i');
+        if (overlayIconElement) {
+             overlayIconElement.className = `fas ${iconClass}`; // Show play or pause on overlay too
+        }
     }
   }
 
@@ -641,8 +693,16 @@ class EnhancedVideoPlayer {
   hideControlsAfterDelay() {
     this.clearControlsTimeout();
     this.controlsTimeout = setTimeout(() => {
-      if (this.controls && this.isPlaying) {
-        this.controls.classList.remove('visible');
+      if (this.controls && this.isPlaying && !this.isDragging) { // Don't hide if dragging
+        // Check if mouse is still over the container or controls; if so, don't hide.
+        // This requires more complex logic or relying on mouseleave from container.
+        // For now, keep it simple: if playing and not dragging, hide after timeout.
+        if (!this.container.matches(':hover') && !this.controls.matches(':hover')) {
+             this.controls.classList.remove('visible');
+        } else {
+            // If still hovering, reset timeout
+            this.hideControlsAfterDelay();
+        }
       }
     }, 3000);
   }
@@ -662,6 +722,7 @@ class EnhancedVideoPlayer {
    */
   showBuffering() {
     // Could implement a loading spinner here
+    this.container.classList.add('video-buffering');
     console.log('Video buffering...');
   }
 
@@ -670,6 +731,7 @@ class EnhancedVideoPlayer {
    */
   hideBuffering() {
     // Hide loading spinner
+    this.container.classList.remove('video-buffering');
     console.log('Video ready to play');
   }
 
@@ -678,9 +740,13 @@ class EnhancedVideoPlayer {
    */
   destroy() {
     this.clearControlsTimeout();
-    // Remove event listeners and clean up
+    // TODO: Add comprehensive event listener removal here
+    // For now, just nullify references
     this.video = null;
     this.container = null;
+    // Ideally, listeners added to `document` should also be removed
+    // (e.g., mousemove/mouseup for dragging, keydown for keyboard controls)
+    // This requires storing bound event handlers to remove them later.
   }
 }
 
@@ -729,18 +795,26 @@ class ModalSystem {
       // Check if the secret gallery is revealed (display is not 'none')
       const isRevealed = window.getComputedStyle(gallery).display !== 'none';
       if (isRevealed) {
-        const secretItems = gallery.querySelectorAll('[data-type]');
+        // Select direct children that are media items, or deeper items if structure requires
+        const secretItems = gallery.querySelectorAll(':scope > .secret-gallery-container [data-type], :scope > [data-type]');
         revealedSecretItems.push(...secretItems);
       }
     });
 
-    // Combine main gallery items with revealed secret items
     const allAccessibleItems = [...mainGalleryItems, ...revealedSecretItems];
+
+    // Remove previous event listeners from old items to prevent duplicates if refreshMediaItems is called
+    this.mediaItems.forEach(item => {
+        if (item.element && item.clickHandler) {
+            item.element.removeEventListener('click', item.clickHandler);
+        }
+    });
+
 
     this.mediaItems = Array.from(allAccessibleItems).map((item, index) => ({
       src: item.getAttribute('data-src'),
       type: item.getAttribute('data-type'),
-      alt: item.querySelector('img')?.alt || `Media ${index + 1}`,
+      alt: item.querySelector('img')?.alt || item.closest('[data-type]')?.querySelector('.secret-image-caption')?.textContent || `Media ${index + 1}`,
       element: item
     }));
   }
@@ -764,7 +838,7 @@ class ModalSystem {
     document.addEventListener('keydown', (e) => {
       if (!this.isOpen) return;
 
-      switch (e.key) {
+      switch (e.key) { // Use e.key for modern browsers
         case 'Escape':
           this.close();
           break;
@@ -783,13 +857,16 @@ class ModalSystem {
 
   setupMediaClickEvents() {
     this.mediaItems.forEach((item, index) => {
-      item.element.addEventListener('click', () => {
+      // Store the handler to be able to remove it later if needed
+      item.clickHandler = () => {
         this.open(index);
-      });
+      };
+      item.element.addEventListener('click', item.clickHandler);
     });
   }
 
   open(index) {
+    if (index < 0 || index >= this.mediaItems.length) return;
     this.currentIndex = index;
     this.isOpen = true;
 
@@ -803,18 +880,25 @@ class ModalSystem {
 
     this.updateCounter();
     this.modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden'; // Prevent background scroll
   }
 
   showImage(item) {
     this.modalVideoContainer.style.display = 'none';
+    if (this.modalVideo) this.modalVideo.pause(); // Pause video if it was playing
     this.modalImg.style.display = 'block';
 
     this.showSpinner();
+    this.modalImg.classList.remove('loaded'); // Reset loaded class
 
     this.modalImg.onload = () => {
       this.hideSpinner();
       this.modalImg.classList.add('loaded');
+    };
+    this.modalImg.onerror = () => {
+        this.hideSpinner();
+        // Handle image load error, e.g., show a placeholder or error message
+        console.error("Failed to load image:", item.src);
     };
 
     this.modalImg.src = item.src;
@@ -824,19 +908,25 @@ class ModalSystem {
   showVideo(item) {
     this.modalImg.style.display = 'none';
     this.modalVideoContainer.style.display = 'block';
+    this.modalVideoContainer.classList.remove('loaded'); // Reset loaded class
 
-    this.modalVideo.src = item.src;
-    this.modalVideoContainer.classList.add('loaded');
+    if (this.modalVideo) {
+        this.modalVideo.src = item.src;
+        this.modalVideo.load(); // Important to load the new source
+        this.modalVideo.play().catch(e => console.error("Error playing modal video:", e)); // Autoplay, handle promise
+        this.modalVideoContainer.classList.add('loaded'); // Add loaded once src is set
+    }
   }
 
   navigate(direction) {
+    if (!this.mediaItems.length) return;
     if (direction === 'next') {
       this.currentIndex = (this.currentIndex + 1) % this.mediaItems.length;
     } else {
       this.currentIndex = (this.currentIndex - 1 + this.mediaItems.length) % this.mediaItems.length;
     }
 
-    this.resetModalContent();
+    // No need to call resetModalContent here, open() will handle new content
     this.open(this.currentIndex);
   }
 
@@ -845,17 +935,19 @@ class ModalSystem {
     this.modal.classList.remove('active');
     this.resetModalContent();
 
-    setTimeout(() => {
-      document.body.style.overflow = 'auto';
-    }, CONFIG.ANIMATION_DURATION);
+    document.body.style.overflow = 'auto'; // Restore scroll
   }
 
   resetModalContent() {
     this.modalImg.classList.remove('loaded');
     this.modalVideoContainer.classList.remove('loaded');
-    this.modalVideo.pause();
-    this.modalVideo.src = '';
-    this.modalImg.src = '';
+    if (this.modalVideo) {
+        this.modalVideo.pause();
+        this.modalVideo.removeAttribute('src'); // More robust reset
+        this.modalVideo.load(); // Reset video element state
+    }
+    this.modalImg.src = ''; // Use empty string for src to clear image
+    this.modalImg.alt = '';
     this.hideSpinner();
   }
 
@@ -872,8 +964,10 @@ class ModalSystem {
   }
 
   updateCounter() {
-    if (this.modalCounter) {
+    if (this.modalCounter && this.mediaItems.length > 0) {
       this.modalCounter.textContent = `${this.currentIndex + 1}/${this.mediaItems.length}`;
+    } else if (this.modalCounter) {
+      this.modalCounter.textContent = `0/0`;
     }
   }
 
@@ -882,9 +976,9 @@ class ModalSystem {
    * This method is called when secret galleries are revealed
    */
   refreshMediaItems() {
-    this.collectMediaItems();
-    // Re-setup click events for new items
-    this.setupMediaClickEvents();
+    this.collectMediaItems(); // This now also removes old listeners
+    this.setupMediaClickEvents(); // Add listeners to new set of items
+    this.updateCounter(); // Update counter if modal is open or items change
   }
 }
 
@@ -930,19 +1024,21 @@ class PuzzleSystem {
   }
 
   selectOption(selectedOption) {
-    const siblings = selectedOption.parentElement.querySelectorAll(`.${this.optionClass}`);
+    const questionElement = selectedOption.closest(`.${this.questionClass}, .puzzle-question-2`);
+    if (!questionElement) return;
+    const siblings = questionElement.querySelectorAll(`.${this.optionClass}`);
     siblings.forEach(sibling => sibling.classList.remove('selected'));
     selectedOption.classList.add('selected');
   }
 
   validateAnswers() {
     const section = document.getElementById(this.sectionId);
-    const questions = section.querySelectorAll(`.${this.questionClass}`);
+    const questions = section.querySelectorAll(`.${this.questionClass}, .puzzle-question-2`); // Include both question types
     let allCorrect = true;
 
     questions.forEach(question => {
       const correctIndex = parseInt(question.getAttribute('data-correct'));
-      const selected = question.querySelector(`.${this.optionClass}.selected`);
+      const selected = question.querySelector(`.${this.optionClass}.selected, .question-option-2.selected`);
 
       if (!selected || parseInt(selected.getAttribute('data-index')) !== correctIndex) {
         allCorrect = false;
@@ -962,36 +1058,40 @@ class PuzzleSystem {
     const failureElement = document.getElementById(this.failureId);
     const galleryElement = document.getElementById(this.galleryId);
 
+    if (!successElement || !failureElement || !galleryElement) return;
+
+
     if (success) {
       successElement.style.display = 'block';
       failureElement.style.display = 'none';
-      galleryElement.style.display = 'block';
+      galleryElement.style.display = 'block'; // Or 'grid' or 'flex' depending on CSS
 
       // FIXED: Reveal secret images with proper animation
-      setTimeout(() => {
-        const secretImageContainers = galleryElement.querySelectorAll('.secret-image-container');
-        secretImageContainers.forEach((container, index) => {
-          setTimeout(() => {
-            container.classList.add('revealed');
-          }, index * 200); // Staggered animation
-        });
+      // Ensure galleryElement itself is visible before animating children
+      galleryElement.offsetHeight; // Force reflow
 
-        // FIXED: Update modal system to include new images AFTER they are revealed
-        if (window.modalSystem) {
-          setTimeout(() => {
-            window.modalSystem.refreshMediaItems();
-          }, 1000);
-        }
-      }, 500);
+      const secretImageContainers = galleryElement.querySelectorAll('.secret-image-container, .video-player-container');
+      secretImageContainers.forEach((container, index) => {
+        setTimeout(() => {
+          container.classList.add('revealed');
+        }, index * 200); // Staggered animation
+      });
 
-      // Trigger confetti animation
-      if (typeof confetti !== 'undefined') {
-        confetti({
-          particleCount: 150,
-          spread: 70,
-          origin: { y: 0.6 }
-        });
+      // FIXED: Update modal system to include new items AFTER they are revealed and animations likely started/done
+      if (window.modalSystem) {
+         // Delay should be enough for CSS display and animations to kick in
+        setTimeout(() => {
+          window.modalSystem.refreshMediaItems();
+        }, secretImageContainers.length * 200 + 300); // Wait for all staggered animations + a buffer
       }
+    // Trigger confetti animation
+    if (typeof confetti !== 'undefined') {
+        confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 }
+        });
+    }
     } else {
       successElement.style.display = 'none';
       failureElement.style.display = 'block';
@@ -1049,7 +1149,7 @@ class BonusSystem {
     // Check encrypted answers
     for (const encryptedAnswer of CONFIG.ENCRYPTED_ANSWERS) {
       const decryptedAnswer = decryptAnswer(encryptedAnswer);
-      if (answer.includes(decryptedAnswer)) {
+      if (decryptedAnswer && answer.includes(decryptedAnswer)) { // Ensure decryptedAnswer is not empty
         isCorrect = true;
         break;
       }
@@ -1058,7 +1158,7 @@ class BonusSystem {
     // Check direct answers as fallback
     if (!isCorrect) {
       isCorrect = CONFIG.ACCEPTED_ANSWERS.some(validAnswer =>
-        answer.includes(validAnswer)
+        answer.includes(normalizeText(validAnswer)) // Normalize validAnswer as well for consistency
       );
     }
 
@@ -1072,12 +1172,14 @@ class BonusSystem {
   showSuccessResult() {
     this.failedAttempts = 0;
     this.bonusResult.classList.add('revealed');
-    this.bonusResult.style.display = 'block';
+    // bonusResult display style is handled by CSS .revealed usually, ensure it becomes visible
+    // If .revealed itself doesn't set display, then:
+    this.bonusResult.style.display = 'block'; // Or whatever its natural display is
 
     // Add highlight animation
     setTimeout(() => {
       this.bonusResult.classList.add('highlight-animation');
-    }, 400);
+    }, 400); // Delay to sync with reveal transition
 
     // Trigger confetti
     if (typeof confetti !== 'undefined') {
@@ -1113,12 +1215,15 @@ class BonusSystem {
 class SimplifiedGallerySystem {
   constructor() {
     this.galleryContainer = document.getElementById('gallery-container');
-    this.galleryItems = document.querySelectorAll('.gallery-item');
+    // Query for items within the specific gallery container
+    this.galleryItems = this.galleryContainer ? this.galleryContainer.querySelectorAll('.gallery-item') : [];
+
 
     this.initialize();
   }
 
   initialize() {
+    if (!this.galleryContainer) return; // Do nothing if container doesn't exist
     this.handleImageLoading();
     this.setupResponsiveLayout();
   }
@@ -1129,20 +1234,29 @@ class SimplifiedGallerySystem {
       const img = item.querySelector('img');
 
       if (!img) {
-        item.classList.add('loaded');
+        item.classList.add('loaded'); // Mark as loaded if no image (e.g. video placeholder)
         return;
       }
 
-      if (img.complete) {
-        // Image already loaded
+      // Staggered animation logic
+      const delay = index * 100;
+
+      if (img.complete && img.naturalHeight !== 0) { // Check if image is already loaded and valid
         setTimeout(() => {
           item.classList.add('loaded');
-        }, index * 100); // Staggered animation
+        }, delay);
       } else {
         img.addEventListener('load', () => {
           setTimeout(() => {
             item.classList.add('loaded');
-          }, index * 100); // Staggered animation
+          }, delay);
+        });
+        img.addEventListener('error', () => {
+            // Handle error: mark as loaded to unblock sequence, or add error class
+            console.error("Failed to load gallery image:", img.src);
+            setTimeout(() => {
+                item.classList.add('loaded'); // Or item.classList.add('load-error');
+            }, delay);
         });
       }
     });
@@ -1150,15 +1264,22 @@ class SimplifiedGallerySystem {
 
   setupResponsiveLayout() {
     // Handle responsive breakpoints for gallery layout
+    // This is mostly handled by CSS Grid, but JS can hook in if needed.
     const mediaQuery = window.matchMedia('(max-width: 768px)');
 
     const handleBreakpointChange = (e) => {
-      // No special handling needed for simplified grid
-      // CSS Grid handles everything automatically
+      // Example: if (e.matches) { // tablet/mobile } else { // desktop }
+      // No special handling needed for simplified grid as per original comment
     };
 
-    mediaQuery.addListener(handleBreakpointChange);
-    handleBreakpointChange(mediaQuery);
+    // addListener is deprecated, use addEventListener
+    if (mediaQuery.addEventListener) {
+        mediaQuery.addEventListener('change', handleBreakpointChange);
+    } else if (mediaQuery.addListener) { // Fallback for older browsers
+        mediaQuery.addListener(handleBreakpointChange);
+    }
+
+    handleBreakpointChange(mediaQuery); // Initial check
   }
 
   /**
@@ -1168,6 +1289,8 @@ class SimplifiedGallerySystem {
    * @returns {number} - Índice de la nueva imagen
    */
   addGalleryImage(src, alt = '') {
+    if (!this.galleryContainer) return -1; // Return -1 or throw error if no container
+
     const newItem = document.createElement('div');
     newItem.className = 'gallery-item';
     newItem.setAttribute('data-type', 'image');
@@ -1181,15 +1304,29 @@ class SimplifiedGallerySystem {
     newItem.appendChild(newImg);
     this.galleryContainer.appendChild(newItem);
 
-    // Handle loading for new image
-    newImg.addEventListener('load', () => {
-      newItem.classList.add('loaded');
-    });
+    // Handle loading for new image (without staggered delay, or apply based on new length)
+    if (newImg.complete && newImg.naturalHeight !== 0) {
+        newItem.classList.add('loaded');
+    } else {
+        newImg.addEventListener('load', () => {
+          newItem.classList.add('loaded');
+        });
+        newImg.addEventListener('error', () => {
+          newItem.classList.add('loaded'); // Or error state
+          console.error("Failed to load dynamically added image:", src);
+        });
+    }
+
 
     // Update gallery items collection
-    this.galleryItems = document.querySelectorAll('.gallery-item');
+    this.galleryItems = this.galleryContainer.querySelectorAll('.gallery-item');
 
-    return this.galleryItems.length;
+    // If modal system exists and needs to be aware of new items immediately:
+    if (window.modalSystem) {
+        window.modalSystem.refreshMediaItems();
+    }
+
+    return this.galleryItems.length -1; // Return the index of the new item
   }
 }
 
@@ -1200,29 +1337,60 @@ class SimplifiedGallerySystem {
  */
 class WeddingCounter {
   constructor() {
-    this.counter = document.getElementById('wedding-counter');
-    this.startDate = new Date(CONFIG.WEDDING_DATE);
+    this.counterElement = document.getElementById('wedding-counter'); // Renamed for clarity
+    this.weddingDate = new Date(CONFIG.WEDDING_DATE); // Renamed for clarity
+    this.intervalId = null; // To store interval ID for potential clearing
 
-    if (this.counter) {
+    if (this.counterElement) {
       this.start();
     }
   }
 
   start() {
-    this.update();
-    setInterval(() => this.update(), 1000);
+    this.update(); // Initial update
+    this.intervalId = setInterval(() => this.update(), 1000);
   }
 
   update() {
     const now = new Date();
-    const diff = new Date(now - this.startDate);
+    // Ensure weddingDate is valid
+    if (isNaN(this.weddingDate.getTime())) {
+        this.counterElement.textContent = "Fecha de boda no válida.";
+        if (this.intervalId) clearInterval(this.intervalId);
+        return;
+    }
 
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = diff.getUTCHours();
-    const minutes = diff.getUTCMinutes();
-    const seconds = diff.getUTCSeconds();
+    const diffMs = now - this.weddingDate;
 
-    this.counter.textContent = `Llevan casados ${days} días, ${hours} h, ${minutes} min, ${seconds} seg.`;
+    if (diffMs < 0) {
+        // Future date handling (countdown to wedding)
+        const timeToWedding = Math.abs(diffMs);
+        const days = Math.floor(timeToWedding / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((timeToWedding % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((timeToWedding % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeToWedding % (1000 * 60)) / 1000);
+        this.counterElement.textContent = `Faltan para la boda: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+        return;
+    }
+
+    // Past date handling (married for)
+    // Using simple subtraction for days assumes same timezone or UTC logic consistently.
+    // For precise day counting across timezones, a library like date-fns or moment.js is better.
+    // This simplified version calculates total elapsed time.
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+
+    this.counterElement.textContent = `Llevan casados ${days} días, ${hours}h, ${minutes}m, ${seconds}s.`;
+  }
+
+  stop() { // Method to stop the counter if needed
+    if (this.intervalId) {
+        clearInterval(this.intervalId);
+        this.intervalId = null;
+    }
   }
 }
 
@@ -1233,16 +1401,18 @@ class WeddingCounter {
  */
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize Wedding Counter
-  new WeddingCounter();
+  const weddingCounter = new WeddingCounter();
 
   // Initialize Smooth Scrolling
   const scrollButton = document.getElementById('scroll-down');
   scrollButton?.addEventListener('click', () => {
-    const section = document.querySelector('.section');
-    window.scrollTo({
-      top: section.offsetTop,
-      behavior: 'smooth'
-    });
+    const firstSection = document.querySelector('.section'); // Target first actual section
+    if (firstSection) {
+        window.scrollTo({
+          top: firstSection.offsetTop,
+          behavior: 'smooth'
+        });
+    }
   });
 
   // Initialize Enhanced Video Players
@@ -1262,8 +1432,8 @@ document.addEventListener('DOMContentLoaded', () => {
     successId: 'puzzle-success',
     failureId: 'puzzle-failure',
     galleryId: 'secret-gallery',
-    questionClass: 'puzzle-question',
-    optionClass: 'question-option'
+    questionClass: 'puzzle-question', // Specific to puzzle 1
+    optionClass: 'question-option'    // Specific to puzzle 1
   });
 
   const puzzle2 = new PuzzleSystem({
@@ -1272,8 +1442,8 @@ document.addEventListener('DOMContentLoaded', () => {
     successId: 'puzzle-success-2',
     failureId: 'puzzle-failure-2',
     galleryId: 'secret-gallery-2',
-    questionClass: 'puzzle-question-2',
-    optionClass: 'question-option-2'
+    questionClass: 'puzzle-question-2', // Specific to puzzle 2
+    optionClass: 'question-option-2'    // Specific to puzzle 2
   });
 
   // Initialize Bonus System
@@ -1285,16 +1455,28 @@ document.addEventListener('DOMContentLoaded', () => {
   // Performance monitoring
   if (window.performance && window.performance.mark) {
     window.performance.mark('app-initialized');
+    // Example: window.performance.measure('initToInteractive', 'navigationStart', 'app-initialized');
   }
 
-  // Error handling
-  window.addEventListener('error', (e) => {
-    console.error('Application error:', e.error);
+  // Global Error handling
+  window.addEventListener('error', (event) => { // event is the ErrorEvent
+    console.error('Global application error:', event.message, 'at', event.filename, ':', event.lineno, event.error);
+    // Potentially log to a server:
+    // Sentry.captureException(event.error || new Error(event.message));
+  });
+  window.addEventListener('unhandledrejection', (event) => {
+    console.error('Unhandled promise rejection:', event.reason);
+    // Sentry.captureException(event.reason);
   });
 
+
   // Expose systems to global scope for debugging (development only)
-  if (typeof process !== 'undefined' && process?.env?.NODE_ENV === 'development') {
+  // A common check for NODE_ENV might not work directly in browser unless set by build tool
+  // A simpler check could be `window.location.hostname === 'localhost'` or a query param.
+  const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  if (isDevelopment) {
     window.app = {
+      weddingCounter,
       videoPlayers,
       modalSystem,
       puzzle1,
@@ -1302,6 +1484,7 @@ document.addEventListener('DOMContentLoaded', () => {
       bonusSystem,
       gallerySystem
     };
+    console.log('App systems exposed to window.app for debugging.', window.app);
   }
 });
 
@@ -1311,19 +1494,61 @@ document.addEventListener('DOMContentLoaded', () => {
  * ========================================================================
  */
 
-// Intersection Observer polyfill for older browsers
-if (!window.IntersectionObserver) {
-  console.warn('IntersectionObserver not supported, consider adding polyfill');
+// Basic Element.matches polyfill
+if (!Element.prototype.matches) {
+    Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
 }
 
-// RequestAnimationFrame polyfill
-if (!window.requestAnimationFrame) {
-  window.requestAnimationFrame = function(callback) {
-    return setTimeout(callback, 1000 / 60);
-  };
+// Basic Element.closest polyfill
+if (!Element.prototype.closest) {
+    Element.prototype.closest = function(s) {
+        var el = this;
+        do {
+            if (Element.prototype.matches.call(el, s)) return el;
+            el = el.parentElement || el.parentNode;
+        } while (el !== null && el.nodeType === 1);
+        return null;
+    };
 }
+
+
+// Intersection Observer polyfill for older browsers
+// Consider loading this conditionally via a script tag if IntersectionObserver is not supported,
+// or bundling it with a build tool.
+// Example: if (!('IntersectionObserver' in window)) { /* load polyfill */ }
+if (!window.IntersectionObserver) {
+  console.warn('IntersectionObserver not supported, consider adding polyfill for optimal lazy loading or animations.');
+}
+
+// RequestAnimationFrame polyfill (though widely supported now)
+(function() {
+    var lastTime = 0;
+    var vendors = ['ms', 'moz', 'webkit', 'o'];
+    for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+        window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+        window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame']
+                                   || window[vendors[x]+'CancelRequestAnimationFrame'];
+    }
+
+    if (!window.requestAnimationFrame)
+        window.requestAnimationFrame = function(callback, element) {
+            var currTime = new Date().getTime();
+            var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+            var id = window.setTimeout(function() { callback(currTime + timeToCall); },
+              timeToCall);
+            lastTime = currTime + timeToCall;
+            return id;
+        };
+
+    if (!window.cancelAnimationFrame)
+        window.cancelAnimationFrame = function(id) {
+            clearTimeout(id);
+        };
+}());
+
 
 // Export for module systems (if needed)
+// This structure is more for Node.js/CommonJS. For ES modules, use `export class ...`
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     EnhancedVideoPlayer,
@@ -1331,6 +1556,11 @@ if (typeof module !== 'undefined' && module.exports) {
     PuzzleSystem,
     BonusSystem,
     SimplifiedGallerySystem,
-    WeddingCounter
+    WeddingCounter,
+    CONFIG,
+    debounce,
+    formatTime,
+    normalizeText,
+    decryptAnswer
   };
 }
