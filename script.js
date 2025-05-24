@@ -9,7 +9,7 @@
  * Compatibility: Cross-browser support with progressive enhancement
  *
  * @author Technical Development Team
- * @version 2.1.1 - Fixed Secret Gallery Reveal
+ * @version 2.1.2 - Fixed Secret Gallery Modal Access
  * @license MIT
  */
 
@@ -686,7 +686,7 @@ class EnhancedVideoPlayer {
 
 /**
  * ========================================================================
- * MODAL SYSTEM CLASS
+ * MODAL SYSTEM CLASS - FIXED TO PREVENT SECRET GALLERY ACCESS
  * ========================================================================
  */
 class ModalSystem {
@@ -713,9 +713,31 @@ class ModalSystem {
     this.setupEventListeners();
   }
 
+  /**
+   * FIXED: Only collect media items that should be accessible
+   * This prevents access to secret gallery items until they are revealed
+   */
   collectMediaItems() {
-    const items = document.querySelectorAll('[data-type]');
-    this.mediaItems = Array.from(items).map((item, index) => ({
+    // Always include main gallery items
+    const mainGalleryItems = document.querySelectorAll('#gallery-section [data-type]');
+
+    // Only include secret gallery items if their parent gallery is visible
+    const secretGalleries = document.querySelectorAll('.secret-gallery');
+    const revealedSecretItems = [];
+
+    secretGalleries.forEach(gallery => {
+      // Check if the secret gallery is revealed (display is not 'none')
+      const isRevealed = window.getComputedStyle(gallery).display !== 'none';
+      if (isRevealed) {
+        const secretItems = gallery.querySelectorAll('[data-type]');
+        revealedSecretItems.push(...secretItems);
+      }
+    });
+
+    // Combine main gallery items with revealed secret items
+    const allAccessibleItems = [...mainGalleryItems, ...revealedSecretItems];
+
+    this.mediaItems = Array.from(allAccessibleItems).map((item, index) => ({
       src: item.getAttribute('data-src'),
       type: item.getAttribute('data-type'),
       alt: item.querySelector('img')?.alt || `Media ${index + 1}`,
@@ -855,9 +877,13 @@ class ModalSystem {
     }
   }
 
-  // Method to refresh media items when new secret images are revealed
+  /**
+   * FIXED: Refresh method that properly re-collects accessible items
+   * This method is called when secret galleries are revealed
+   */
   refreshMediaItems() {
     this.collectMediaItems();
+    // Re-setup click events for new items
     this.setupMediaClickEvents();
   }
 }
@@ -950,7 +976,7 @@ class PuzzleSystem {
           }, index * 200); // Staggered animation
         });
 
-        // Update modal system to include new images
+        // FIXED: Update modal system to include new images AFTER they are revealed
         if (window.modalSystem) {
           setTimeout(() => {
             window.modalSystem.refreshMediaItems();
