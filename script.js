@@ -1,15 +1,15 @@
 /**
  * ========================================================================
- * WEDDING CELEBRATION WEB APPLICATION
+ * WEDDING CELEBRATION WEB APPLICATION - SIMPLIFIED GALLERY VERSION
  * Enhanced JavaScript with Advanced Video Player Integration
  * ========================================================================
- * 
+ *
  * Architecture: Modular ES6+ JavaScript with OOP Video Player
  * Performance: Optimized event delegation and memory management
  * Compatibility: Cross-browser support with progressive enhancement
- * 
+ *
  * @author Technical Development Team
- * @version 2.0.0
+ * @version 2.1.1 - Fixed Secret Gallery Reveal
  * @license MIT
  */
 
@@ -26,12 +26,12 @@ const CONFIG = {
   DEBOUNCE_DELAY: 150,
   VIDEO_SEEK_STEP: 10,
   VOLUME_STEP: 0.1,
-  
+
   // Bonus puzzle encrypted answers for security
   ENCRYPTED_ANSWERS: [
     'a3hoeXI=', 'a3hoeXJ2', 'ZnJtcnFodg==', 'aWRuaA=='
   ],
-  
+
   // Direct answers as fallback
   ACCEPTED_ANSWERS: [
     'photoshop', 'fake', 'falsa', 'montaje', 'editada', 'trucada', 'modificada'
@@ -114,7 +114,7 @@ class EnhancedVideoPlayer {
     this.video = container.querySelector('.video-player');
     this.overlay = container.querySelector('[data-video-overlay]');
     this.controls = container.querySelector('[data-video-controls]');
-    
+
     // Control elements
     this.playButton = container.querySelector('[data-play-button]');
     this.playPauseBtn = container.querySelector('[data-play-pause-btn]');
@@ -125,13 +125,13 @@ class EnhancedVideoPlayer {
     this.muteBtn = container.querySelector('[data-mute-btn]');
     this.volumeSlider = container.querySelector('[data-volume-slider]');
     this.fullscreenBtn = container.querySelector('[data-fullscreen-btn]');
-    
+
     // State management
     this.isPlaying = false;
     this.isDragging = false;
     this.wasPlayingBeforeDrag = false;
     this.controlsTimeout = null;
-    
+
     this.initialize();
   }
 
@@ -142,7 +142,7 @@ class EnhancedVideoPlayer {
     this.setupEventListeners();
     this.setupKeyboardControls();
     this.updateTimeDisplay();
-    
+
     // Hide controls initially
     this.hideControlsAfterDelay();
   }
@@ -350,7 +350,7 @@ class EnhancedVideoPlayer {
           break;
         case 'ArrowUp':
           e.preventDefault();
-          this.adjustVolume(CONFIG.VOLUME_STEP);
+          this.adjustVolume(CONFIG.VIDEO_SEEK_STEP);
           break;
         case 'ArrowDown':
           e.preventDefault();
@@ -375,13 +375,13 @@ class EnhancedVideoPlayer {
   startDragging(e) {
     this.isDragging = true;
     this.wasPlayingBeforeDrag = !this.video.paused;
-    
+
     if (this.wasPlayingBeforeDrag) {
       this.video.pause();
     }
-    
+
     this.seekTo(e);
-    
+
     if (this.progressHandle) {
       this.progressHandle.style.opacity = '1';
     }
@@ -392,13 +392,13 @@ class EnhancedVideoPlayer {
    */
   stopDragging() {
     if (!this.isDragging) return;
-    
+
     this.isDragging = false;
-    
+
     if (this.wasPlayingBeforeDrag) {
       this.video.play();
     }
-    
+
     if (this.progressHandle) {
       this.progressHandle.style.opacity = '0';
     }
@@ -420,7 +420,7 @@ class EnhancedVideoPlayer {
    */
   play() {
     const playPromise = this.video.play();
-    
+
     if (playPromise !== undefined) {
       playPromise.then(() => {
         this.isPlaying = true;
@@ -501,11 +501,11 @@ class EnhancedVideoPlayer {
       const newVolume = Math.max(0, Math.min(1, this.video.volume + delta));
       this.video.volume = newVolume;
       this.video.muted = newVolume === 0;
-      
+
       if (this.volumeSlider) {
         this.volumeSlider.value = newVolume * 100;
       }
-      
+
       this.updateVolumeUI();
     }
   }
@@ -576,7 +576,7 @@ class EnhancedVideoPlayer {
    */
   updatePlayButton() {
     const icon = this.isPlaying ? 'fa-pause' : 'fa-play';
-    
+
     if (this.playPauseBtn) {
       const iconElement = this.playPauseBtn.querySelector('i');
       if (iconElement) {
@@ -700,11 +700,11 @@ class ModalSystem {
     this.modalCounter = document.getElementById('modal-counter');
     this.prevBtn = document.getElementById('prev-photo');
     this.nextBtn = document.getElementById('next-photo');
-    
+
     this.currentIndex = 0;
     this.mediaItems = [];
     this.isOpen = false;
-    
+
     this.initialize();
   }
 
@@ -726,22 +726,22 @@ class ModalSystem {
   setupEventListeners() {
     // Close modal events
     this.closeModal?.addEventListener('click', () => this.close());
-    
+
     // Navigation events
     this.prevBtn?.addEventListener('click', () => this.navigate('prev'));
     this.nextBtn?.addEventListener('click', () => this.navigate('next'));
-    
+
     // Modal overlay click to close
     this.modal?.addEventListener('click', (e) => {
       if (e.target === this.modal) {
         this.close();
       }
     });
-    
+
     // Keyboard navigation
     document.addEventListener('keydown', (e) => {
       if (!this.isOpen) return;
-      
+
       switch (e.key) {
         case 'Escape':
           this.close();
@@ -754,7 +754,7 @@ class ModalSystem {
           break;
       }
     });
-    
+
     // Media item click events
     this.setupMediaClickEvents();
   }
@@ -770,15 +770,15 @@ class ModalSystem {
   open(index) {
     this.currentIndex = index;
     this.isOpen = true;
-    
+
     const item = this.mediaItems[this.currentIndex];
-    
+
     if (item.type === 'video') {
       this.showVideo(item);
     } else {
       this.showImage(item);
     }
-    
+
     this.updateCounter();
     this.modal.classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -787,14 +787,14 @@ class ModalSystem {
   showImage(item) {
     this.modalVideoContainer.style.display = 'none';
     this.modalImg.style.display = 'block';
-    
+
     this.showSpinner();
-    
+
     this.modalImg.onload = () => {
       this.hideSpinner();
       this.modalImg.classList.add('loaded');
     };
-    
+
     this.modalImg.src = item.src;
     this.modalImg.alt = item.alt;
   }
@@ -802,7 +802,7 @@ class ModalSystem {
   showVideo(item) {
     this.modalImg.style.display = 'none';
     this.modalVideoContainer.style.display = 'block';
-    
+
     this.modalVideo.src = item.src;
     this.modalVideoContainer.classList.add('loaded');
   }
@@ -813,7 +813,7 @@ class ModalSystem {
     } else {
       this.currentIndex = (this.currentIndex - 1 + this.mediaItems.length) % this.mediaItems.length;
     }
-    
+
     this.resetModalContent();
     this.open(this.currentIndex);
   }
@@ -822,7 +822,7 @@ class ModalSystem {
     this.isOpen = false;
     this.modal.classList.remove('active');
     this.resetModalContent();
-    
+
     setTimeout(() => {
       document.body.style.overflow = 'auto';
     }, CONFIG.ANIMATION_DURATION);
@@ -854,11 +854,17 @@ class ModalSystem {
       this.modalCounter.textContent = `${this.currentIndex + 1}/${this.mediaItems.length}`;
     }
   }
+
+  // Method to refresh media items when new secret images are revealed
+  refreshMediaItems() {
+    this.collectMediaItems();
+    this.setupMediaClickEvents();
+  }
 }
 
 /**
  * ========================================================================
- * PUZZLE SYSTEM CLASS
+ * PUZZLE SYSTEM CLASS - FIXED SECRET GALLERY REVEAL
  * ========================================================================
  */
 class PuzzleSystem {
@@ -870,7 +876,7 @@ class PuzzleSystem {
     this.galleryId = config.galleryId;
     this.questionClass = config.questionClass;
     this.optionClass = config.optionClass;
-    
+
     this.initialize();
   }
 
@@ -881,7 +887,7 @@ class PuzzleSystem {
   setupEventListeners() {
     const checkBtn = document.getElementById(this.checkBtnId);
     const section = document.getElementById(this.sectionId);
-    
+
     if (!checkBtn || !section) return;
 
     checkBtn.addEventListener('click', () => {
@@ -911,7 +917,7 @@ class PuzzleSystem {
     questions.forEach(question => {
       const correctIndex = parseInt(question.getAttribute('data-correct'));
       const selected = question.querySelector(`.${this.optionClass}.selected`);
-      
+
       if (!selected || parseInt(selected.getAttribute('data-index')) !== correctIndex) {
         allCorrect = false;
         question.classList.add('incorrect');
@@ -934,7 +940,24 @@ class PuzzleSystem {
       successElement.style.display = 'block';
       failureElement.style.display = 'none';
       galleryElement.style.display = 'block';
-      
+
+      // FIXED: Reveal secret images with proper animation
+      setTimeout(() => {
+        const secretImageContainers = galleryElement.querySelectorAll('.secret-image-container');
+        secretImageContainers.forEach((container, index) => {
+          setTimeout(() => {
+            container.classList.add('revealed');
+          }, index * 200); // Staggered animation
+        });
+
+        // Update modal system to include new images
+        if (window.modalSystem) {
+          setTimeout(() => {
+            window.modalSystem.refreshMediaItems();
+          }, 1000);
+        }
+      }, 500);
+
       // Trigger confetti animation
       if (typeof confetti !== 'undefined') {
         confetti({
@@ -964,9 +987,9 @@ class BonusSystem {
     this.bonusAnswer = document.getElementById('bonus-answer');
     this.bonusResult = document.getElementById('bonus-result');
     this.bonusHint = document.querySelector('.bonus-hint');
-    
+
     this.failedAttempts = 0;
-    
+
     this.initialize();
   }
 
@@ -1058,87 +1081,42 @@ class BonusSystem {
 
 /**
  * ========================================================================
- * GALLERY SYSTEM CLASS
+ * SIMPLIFIED GALLERY SYSTEM CLASS
  * ========================================================================
  */
-class GallerySystem {
+class SimplifiedGallerySystem {
   constructor() {
     this.galleryContainer = document.getElementById('gallery-container');
     this.galleryItems = document.querySelectorAll('.gallery-item');
-    
+
     this.initialize();
   }
 
   initialize() {
-    this.setupMasonryLayout();
     this.handleImageLoading();
     this.setupResponsiveLayout();
   }
 
-  setupMasonryLayout() {
-    const resizeGridItems = () => {
-      const rowHeight = 15; // Must match CSS grid-auto-rows
-      const rowGap = 15;    // Must match CSS grid-gap
-
-      this.galleryItems.forEach(item => {
-        const imgElement = item.querySelector('img');
-        if (!imgElement) return;
-
-        if (imgElement.complete) {
-          this.calculateSpan(item, imgElement, rowHeight, rowGap);
-        } else {
-          imgElement.addEventListener('load', () => {
-            this.calculateSpan(item, imgElement, rowHeight, rowGap);
-          });
-        }
-      });
-    };
-
-    // Initial layout
-    resizeGridItems();
-
-    // Responsive layout updates
-    window.addEventListener('resize', debounce(resizeGridItems, CONFIG.DEBOUNCE_DELAY));
-    window.addEventListener('load', () => {
-      resizeGridItems();
-      setTimeout(resizeGridItems, 1000);
-    });
-  }
-
-  calculateSpan(item, imgElement, rowHeight, rowGap) {
-    const height = imgElement.getBoundingClientRect().height;
-    const rowSpan = Math.ceil((height + rowGap) / (rowHeight + rowGap));
-    item.style.setProperty('--row-span', rowSpan);
-    item.style.gridRowEnd = `span ${rowSpan}`;
-  }
-
   handleImageLoading() {
-    let loadedCount = 0;
-    const totalImages = this.galleryItems.length;
-
-    const onAllLoaded = () => {
-      setTimeout(() => this.setupMasonryLayout(), 50);
-      setTimeout(() => this.setupMasonryLayout(), 500);
-    };
-
-    this.galleryItems.forEach(item => {
+    // Add loading animation to images
+    this.galleryItems.forEach((item, index) => {
       const img = item.querySelector('img');
 
       if (!img) {
-        loadedCount++;
-        if (loadedCount === totalImages) onAllLoaded();
+        item.classList.add('loaded');
         return;
       }
 
       if (img.complete) {
-        item.classList.add('loaded');
-        loadedCount++;
-        if (loadedCount === totalImages) onAllLoaded();
+        // Image already loaded
+        setTimeout(() => {
+          item.classList.add('loaded');
+        }, index * 100); // Staggered animation
       } else {
         img.addEventListener('load', () => {
-          item.classList.add('loaded');
-          loadedCount++;
-          if (loadedCount === totalImages) onAllLoaded();
+          setTimeout(() => {
+            item.classList.add('loaded');
+          }, index * 100); // Staggered animation
         });
       }
     });
@@ -1147,27 +1125,22 @@ class GallerySystem {
   setupResponsiveLayout() {
     // Handle responsive breakpoints for gallery layout
     const mediaQuery = window.matchMedia('(max-width: 768px)');
-    
+
     const handleBreakpointChange = (e) => {
-      if (e.matches) {
-        // Mobile layout adjustments
-        this.galleryItems.forEach(item => {
-          item.style.gridColumn = '1 / -1';
-          item.style.gridRow = 'span 6';
-        });
-      } else {
-        // Desktop layout - reset to CSS defaults
-        this.galleryItems.forEach(item => {
-          item.style.gridColumn = '';
-          item.style.gridRow = '';
-        });
-      }
+      // No special handling needed for simplified grid
+      // CSS Grid handles everything automatically
     };
 
     mediaQuery.addListener(handleBreakpointChange);
     handleBreakpointChange(mediaQuery);
   }
 
+  /**
+   * Método para añadir nuevas imágenes dinámicamente
+   * @param {string} src - URL de la imagen
+   * @param {string} alt - Texto alternativo
+   * @returns {number} - Índice de la nueva imagen
+   */
   addGalleryImage(src, alt = '') {
     const newItem = document.createElement('div');
     newItem.className = 'gallery-item';
@@ -1176,18 +1149,19 @@ class GallerySystem {
 
     const newImg = document.createElement('img');
     newImg.src = src;
-    newImg.alt = alt || `Foto ${this.galleryItems.length + 1}`;
+    newImg.alt = alt || `Momento especial ${this.galleryItems.length + 1}`;
     newImg.className = 'gallery-img';
-    newImg.setAttribute('loading', 'lazy');
 
     newItem.appendChild(newImg);
     this.galleryContainer.appendChild(newItem);
 
-    // Handle loading for masonry
+    // Handle loading for new image
     newImg.addEventListener('load', () => {
       newItem.classList.add('loaded');
-      this.calculateSpan(newItem, newImg, 15, 15);
     });
+
+    // Update gallery items collection
+    this.galleryItems = document.querySelectorAll('.gallery-item');
 
     return this.galleryItems.length;
   }
@@ -1202,7 +1176,7 @@ class WeddingCounter {
   constructor() {
     this.counter = document.getElementById('wedding-counter');
     this.startDate = new Date(CONFIG.WEDDING_DATE);
-    
+
     if (this.counter) {
       this.start();
     }
@@ -1216,12 +1190,12 @@ class WeddingCounter {
   update() {
     const now = new Date();
     const diff = new Date(now - this.startDate);
-    
+
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = diff.getUTCHours();
     const minutes = diff.getUTCMinutes();
     const seconds = diff.getUTCSeconds();
-    
+
     this.counter.textContent = `Llevan casados ${days} días, ${hours} h, ${minutes} min, ${seconds} seg.`;
   }
 }
@@ -1247,12 +1221,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize Enhanced Video Players
   const videoContainers = document.querySelectorAll('.video-player-container');
-  const videoPlayers = Array.from(videoContainers).map(container => 
+  const videoPlayers = Array.from(videoContainers).map(container =>
     new EnhancedVideoPlayer(container)
   );
 
-  // Initialize Modal System
+  // Initialize Modal System and make it globally accessible
   const modalSystem = new ModalSystem();
+  window.modalSystem = modalSystem; // Make globally accessible for puzzle system
 
   // Initialize Puzzle Systems
   const puzzle1 = new PuzzleSystem({
@@ -1278,8 +1253,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize Bonus System
   const bonusSystem = new BonusSystem();
 
-  // Initialize Gallery System
-  const gallerySystem = new GallerySystem();
+  // Initialize Simplified Gallery System
+  const gallerySystem = new SimplifiedGallerySystem();
 
   // Performance monitoring
   if (window.performance && window.performance.mark) {
@@ -1292,7 +1267,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Expose systems to global scope for debugging (development only)
-  if (process?.env?.NODE_ENV === 'development') {
+  if (typeof process !== 'undefined' && process?.env?.NODE_ENV === 'development') {
     window.app = {
       videoPlayers,
       modalSystem,
@@ -1329,7 +1304,7 @@ if (typeof module !== 'undefined' && module.exports) {
     ModalSystem,
     PuzzleSystem,
     BonusSystem,
-    GallerySystem,
+    SimplifiedGallerySystem,
     WeddingCounter
   };
 }

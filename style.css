@@ -10,14 +10,10 @@
   --light: #f5f5f5;
   --medium: #e0e0e0;
   
-  /* Grid System Variables */
-  --grid-row-size: 15px;
-  --grid-gap: 15px;
-  
   /* Typography Scale */
   --font-family-primary: 'Poppins', sans-serif;
   --font-family-serif: 'Cormorant Garamond', serif;
-  
+
   /* Spacing Scale */
   --spacing-xs: 0.5rem;
   --spacing-sm: 1rem;
@@ -25,11 +21,11 @@
   --spacing-lg: 2rem;
   --spacing-xl: 3rem;
   --spacing-xxl: 5rem;
-  
+
   /* Animation Timing Functions */
   --ease-out-cubic: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   --ease-in-out-cubic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  
+
   /* Z-index Layering System */
   --z-index-modal: 2000;
   --z-index-modal-content: 2001;
@@ -464,16 +460,11 @@ button {
 }
 
 /* ========================================================================
-   SECRET GALLERY - Sistema de galería desbloqueada
+   SECRET GALLERY - Sistema de galería desbloqueada CORREGIDO
    ======================================================================== */
 .secret-gallery {
   display: none;
   margin-top: var(--spacing-xl);
-}
-
-.secret-gallery.revealed {
-  display: block;
-  animation: fadeUp 1s ease forwards;
 }
 
 .secret-gallery-heading {
@@ -496,18 +487,26 @@ button {
   justify-items: center;
 }
 
+/* FIXED: Secret image containers animation */
 .secret-image-container {
   overflow: hidden;
   border-radius: 8px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transition: all 0.3s ease;
+  /* INICIO: Invisible por defecto */
   opacity: 0;
-  transform: scale(0.9);
+  transform: scale(0.8) translateY(20px);
+  /* Asegurar que esté preparado para animación */
+  visibility: hidden;
 }
 
+/* FIXED: Estado revelado con animación */
 .secret-image-container.revealed {
-  animation: popIn 0.5s ease forwards;
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  visibility: visible;
+  animation: popIn 0.6s var(--ease-in-out-cubic) forwards;
 }
 
 .secret-image-container:hover {
@@ -757,7 +756,7 @@ button {
 }
 
 /* ========================================================================
-   GALLERY SECTION - Sistema de galería masonry
+   GALLERY SECTION SIMPLIFICADA - Sistema de galería más simple
    ======================================================================== */
 .gallery-section {
   padding: var(--spacing-xxl) 0;
@@ -799,12 +798,11 @@ button {
   background-color: var(--highlight);
 }
 
-/* Masonry Grid Implementation */
+/* Simplified Gallery Grid */
 .gallery-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  grid-auto-rows: var(--grid-row-size);
-  grid-gap: var(--grid-gap);
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-lg);
   position: relative;
   z-index: 1;
   max-width: 1400px;
@@ -814,17 +812,15 @@ button {
 
 .gallery-item {
   position: relative;
-  border-radius: 8px;
+  aspect-ratio: 1;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
   cursor: pointer;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: transform 0.4s var(--ease-out-cubic),
-              box-shadow 0.4s ease,
-              opacity 0.6s ease;
+  transition: all 0.4s var(--ease-out-cubic);
   background-color: rgba(15, 52, 96, 0.1);
-  will-change: transform, opacity;
+  opacity: 0;
+  transform: translateY(30px);
 }
 
 .gallery-item.loaded {
@@ -833,8 +829,8 @@ button {
 }
 
 .gallery-item:hover {
-  transform: translateY(-5px) scale(1.02);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+  transform: translateY(-10px) scale(1.03);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
   z-index: 2;
 }
 
@@ -843,12 +839,11 @@ button {
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.5s var(--ease-out-cubic);
-  will-change: transform;
+  transition: transform 0.6s var(--ease-out-cubic);
 }
 
 .gallery-item:hover .gallery-img {
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 
 /* ========================================================================
@@ -1258,18 +1253,22 @@ button {
   }
 }
 
+/* FIXED: Animación popIn mejorada para secret gallery */
 @keyframes popIn {
   0% {
     opacity: 0;
-    transform: scale(0.8);
+    transform: scale(0.7) translateY(30px);
+    visibility: hidden;
   }
-  70% {
-    transform: scale(1.05);
-    opacity: 1;
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05) translateY(-5px);
+    visibility: visible;
   }
   100% {
-    transform: scale(1);
     opacity: 1;
+    transform: scale(1) translateY(0);
+    visibility: visible;
   }
 }
 
@@ -1350,7 +1349,7 @@ button {
     text-shadow: 0 0 4px rgba(233, 69, 96, 0.2);
   }
   100% {
-    text-shadow: 0 0 10px rgba(233, 69, 96, 0.8), 
+    text-shadow: 0 0 10px rgba(233, 69, 96, 0.8),
                  0 0 20px rgba(233, 69, 96, 0.4);
   }
 }
@@ -1389,7 +1388,7 @@ button {
    ======================================================================== */
 @media (max-width: 1200px) {
   .gallery-container {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   }
 }
 
@@ -1426,7 +1425,8 @@ button {
 
   /* Gallery adjustments */
   .gallery-container {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-md);
     padding: 0 var(--spacing-sm);
   }
 
@@ -1482,11 +1482,6 @@ button {
 @media (max-width: 576px) {
   .gallery-container {
     grid-template-columns: 1fr;
-    grid-auto-rows: auto;
-  }
-
-  .gallery-item {
-    height: 250px;
   }
 
   .video-player-container {
